@@ -11,28 +11,27 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
 {
 
   /** @var Filesystem */
-  protected $fs;
+    protected $fs;
 
   /** @var string */
-  protected $composerizeDrupalPath;
+    protected $composerizeDrupalPath;
 
   /** @var string */
-  protected $sandbox;
+    protected $sandbox;
 
   /** @var \Grasmash\ComposerConverter\Tests\SandboxManager */
-  protected $sandboxManager;
+    protected $sandboxManager;
 
   /**
    * {@inheritdoc}
    *
    * @see https://symfony.com/doc/current/console.html#testing-commands
    */
-  public function setUp()
-  {
-    parent::setUp();
-    $this->fs = new Filesystem();
-    $this->composerizeDrupalPath = dirname(dirname(dirname(__DIR__)));
-    $this->sandboxManager = new SandboxManager();
-  }
-
+    public function setUp()
+    {
+        parent::setUp();
+        $this->fs = new Filesystem();
+        $this->composerizeDrupalPath = dirname(dirname(dirname(__DIR__)));
+        $this->sandboxManager = new SandboxManager();
+    }
 }

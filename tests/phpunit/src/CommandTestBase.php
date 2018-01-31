@@ -29,5 +29,4 @@ abstract class CommandTestBase extends TestBase
         parent::setUp();
         $this->application = new Application();
     }
-
 }

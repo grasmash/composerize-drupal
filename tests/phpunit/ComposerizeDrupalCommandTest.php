@@ -49,7 +49,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
         $process = new Process('composer require drupal/token:1.1.0');
-        $process->setTimeout(NULL);
+        $process->setTimeout(null);
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($this->sandbox . "/docroot/modules/contrib/token");
@@ -67,6 +67,4 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
 
         $this->assertFileExists($this->composerizeDrupalPath . "/composer.json");
     }
-
-
 }

@@ -2,7 +2,8 @@
 
 namespace Grasmash\ComposerConverter\Utility;
 
-class ArrayManipulator {
+class ArrayManipulator
+{
   /**
    * Merges arrays recursively while preserving.
    *
@@ -16,21 +17,21 @@ class ArrayManipulator {
    *
    * @see http://php.net/manual/en/function.array-merge-recursive.php#92195
    */
-  public static function arrayMergeRecursiveDistinct(
-    array &$array1,
-    array &$array2
-  ) {
-    $merged = $array1;
-    foreach ($array2 as $key => &$value) {
-      if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
-        $merged[$key] = self::arrayMergeRecursiveDistinct($merged[$key],
-          $value);
-      }
-      else {
-        $merged[$key] = $value;
-      }
+    public static function arrayMergeRecursiveDistinct(
+        array &$array1,
+        array &$array2
+    ) {
+        $merged = $array1;
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = self::arrayMergeRecursiveDistinct(
+                    $merged[$key],
+                    $value
+                );
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+        return $merged;
     }
-    return $merged;
-  }
-
 }
