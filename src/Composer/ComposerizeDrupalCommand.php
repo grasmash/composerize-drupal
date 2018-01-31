@@ -120,9 +120,10 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected function mergeTemplateIntoRootComposerJson()
     {
         $root_composer_json = $this->loadRootComposerJson();
-        $merged_composer_json = ArrayManipulator::arrayMergeRecursiveDistinct(
+        $template_composer_json = $this->getTemplateComposerJson();
+        $merged_composer_json = ComposerJsonManipulator::merge(
             $root_composer_json,
-            $this->getTemplateComposerJson()
+            $template_composer_json
         );
         ComposerJsonManipulator::writeObjectToJsonFile($merged_composer_json, $this->rootComposerJsonPath);
     }
@@ -140,7 +141,9 @@ class ComposerizeDrupalCommand extends BaseCommand
         $modules = DrupalInspector::findModules($this->drupalRoot);
         $root_composer_json = $this->loadRootComposerJson();
         foreach ($modules as $module => $version) {
-            $root_composer_json->require->{$module} = "^" . $version;
+            $package_name = "drupal/$module";
+            $version_constraint = "^" . $version;
+            $root_composer_json->require->{$package_name} = $version_constraint;
         }
         ComposerJsonManipulator::writeObjectToJsonFile(
             $root_composer_json,

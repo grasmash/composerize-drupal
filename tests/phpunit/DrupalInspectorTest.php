@@ -33,10 +33,6 @@ class DrupalInspectorTest extends TestBase
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->mergeTemplateIntoSandbox();
-        $process = new Process('composer require drupal/ctools:3.0');
-        $process->setTimeout(null);
-        $process->run();
-
         $modules = DrupalInspector::findModules($this->sandbox . "/docroot");
         $this->assertArrayHasKey('ctools', $modules);
         $this->assertContains('3.0.0', $modules);

@@ -37,7 +37,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
 
         // Modules existing in codebase were added to composer.json.
-        $this->assertContains('drupal/ctools', $composer_json->require);
+        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
         $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
     }
     /**
@@ -65,6 +65,6 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
 
-        $this->assertFileExists($this->composerizeDrupalPath . "/composer.json");
+        $this->assertFileExists($this->sandbox . "/composer.json");
     }
 }
