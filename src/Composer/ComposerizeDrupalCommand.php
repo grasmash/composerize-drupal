@@ -130,10 +130,10 @@ class ComposerizeDrupalCommand extends BaseCommand
 
     protected function createNewComposerJson()
     {
-        file_put_contents(
-            $this->rootComposerJsonPath,
-            $this->getTemplateComposerJson()
-        );
+      ComposerJsonManipulator::writeObjectToJsonFile(
+        $this->getTemplateComposerJson(),
+        $this->rootComposerJsonPath
+      );
     }
 
     protected function addDrupalModulesToComposerJson()
