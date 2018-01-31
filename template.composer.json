@@ -1,0 +1,45 @@
+{
+  "type": "project",
+  "repositories": {
+    "drupal": {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    },
+    "asset-packagist": {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  },
+  "require": {
+    "composer/installers": "^1.2.0",
+    "cweagans/composer-patches": "^1.6.4",
+    "oomphinc/composer-installers-extender": "^1.1",
+    "wikimedia/composer-merge-plugin": "^1.4.1"
+  },
+  "require-dev": {},
+  "extra": {
+    "enable-patching": true,
+    "installer-types": ["bower-asset", "npm-asset"],
+    "installer-paths": {
+      "[drupal-root]/core": ["type:drupal-core"],
+      "[drupal-root]/modules/contrib/{$name}": ["type:drupal-module"],
+      "[drupal-root]/modules/custom/{$name}": ["type:drupal-custom-module"],
+      "[drupal-root]/profiles/contrib/{$name}": ["type:drupal-profile"],
+      "[drupal-root]/profiles/custom/{$name}": ["type:drupal-custom-profile"],
+      "[drupal-root]/themes/contrib/{$name}": ["type:drupal-theme"],
+      "[drupal-root]/themes/custom/{$name}": ["type:drupal-custom-theme"],
+      "[drupal-root]/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"],
+      "drush/contrib/{$name}": ["type:drupal-drush"]
+    },
+    "merge-plugin": {
+      "include": [
+        "[drupal-root]/modules/custom/*/composer.json"
+      ],
+      "replace": false,
+      "ignore-duplicates": true
+    },
+    "patches": {}
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
