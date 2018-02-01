@@ -11,7 +11,7 @@ It is not for creating new Drupal applications. If you want to create a brand ne
 The `composerize-drupal` command will perform the following operations:
 
 * Remove all vestigial `composer.json` and `composer.lock` files
-* Generate a new `composer.json` in the `[composer-root]` directory based on [template.composer.json](template.composer.json)
+* Generate a new `composer.json` in the `[composer-root]` directory based on [template.composer.json](template.composer.json).
     * Populate `require` with an entry for `drupal/core`
     * Populate `require` with an entry for each project in:
         * `[drupal-root]/modules/contrib`
@@ -19,6 +19,8 @@ The `composerize-drupal` command will perform the following operations:
         * `[drupal-root]/profiles/contrib`
 * Create or modify `[composer-root]/.gitignore` with entries for Composer-managed contributed projects as [per best practices](https://getcomposer.org/doc/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md). You can modify `.gitignore` after composerization if you'd prefer not to follow this practice.
 * Execute `composer update` to generate `composer.lock`, autoload files, and install all dependencies in the correct locations.
+
+It will NOT add any contributed projects in `docroot/libraries` to `composer.json`. You must add those to your `composer.json` file manually. In addition to [packagist](https://packagist.org/) and Drupal.org packages, you may also use any package from [asset packagist](https://asset-packagist.org/), which makes NPM packages available to Composer.
 
 ## Installation
 
