@@ -72,10 +72,8 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected function determineBaseDir()
     {
         try {
-          $composer = $this->getComposer(FALSE);
-        }
-        catch (\Exception $e) {
-
+            $composer = $this->getComposer(false);
+        } catch (\Exception $e) {
         }
         if (isset($composer)) {
             $composer_json = $this->getComposer(false)
@@ -135,10 +133,10 @@ class ComposerizeDrupalCommand extends BaseCommand
 
     protected function createNewComposerJson()
     {
-      ComposerJsonManipulator::writeObjectToJsonFile(
-        $this->getTemplateComposerJson(),
-        $this->rootComposerJsonPath
-      );
+        ComposerJsonManipulator::writeObjectToJsonFile(
+            $this->getTemplateComposerJson(),
+            $this->rootComposerJsonPath
+        );
     }
 
     protected function addDrupalModulesToComposerJson()
