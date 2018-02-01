@@ -24,7 +24,6 @@ class PluginTest extends CommandTestBase
      */
     public function testComposerCommandsAvailable($expected)
     {
-
         $process = new Process('composer global config repositories.composerize-drupal path $(pwd)', $this->sandbox);
         $process->run();
         $process = new Process('composer global require grasmash/composerize-drupal "*@dev"', $this->sandbox);
