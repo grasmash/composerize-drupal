@@ -2,6 +2,7 @@
 
 namespace Grasmash\ComposerConverter\Tests;
 
+use Alchemy\Zippy\Zippy;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
@@ -9,6 +10,8 @@ use Webmozart\PathUtil\Path;
 
 class SandboxManager
 {
+    protected $tmp;
+
     protected $drupalVersion;
 
   /** @var string */
@@ -33,15 +36,15 @@ class SandboxManager
    */
     public function makeSandbox()
     {
-        $tmp = getenv('COMPOSERIZE_DRUPAL_TMP') ?: sys_get_temp_dir();
-        $sandbox = Path::canonicalize($tmp . "/composerize-drupal-sandbox");
+        $this->tmp = getenv('COMPOSERIZE_DRUPAL_TMP') ?: sys_get_temp_dir();
+        $sandbox = Path::canonicalize($this->tmp . "/composerize-drupal-sandbox");
         $this->fs->remove([$sandbox]);
         $this->fs->mkdir([$sandbox]);
         $sandbox = realpath($sandbox);
         $sandbox_master = Path::canonicalize($this->composerizeDrupalPath . "/tests/fixtures/sandbox");
         $this->fs->mirror($sandbox_master, $sandbox);
-        $this->dowloadAndCopyDrupalCore($this->drupalVersion, $tmp, $sandbox);
-        $this->downloadAndCopyCtools($tmp, $sandbox);
+        $this->dowloadAndCopyDrupalCore($this->drupalVersion, $this->tmp, $sandbox);
+        $this->downloadAndCopyCtools($this->tmp, $sandbox);
 
         chdir($sandbox);
         $process = new Process(
@@ -54,37 +57,27 @@ class SandboxManager
         return $sandbox;
     }
 
-    /**
-     * @param $tarball_filepath
-     * @param $tarball_filename
-     * @param $tar_filepath
-     * @param $untarred_dirpath
-     */
-    protected function downloadProjectFromDrupalOrg(
-        $tarball_filepath,
-        $tarball_filename,
-        $tar_filepath,
-        $untarred_dirpath
-    ) {
-        if (!file_exists($tarball_filepath)) {
+    protected function downloadProjectFromDrupalOrg($project_string) {
+        $targz_filename = "$project_string.tar.gz";
+        $targz_filepath = "{$this->tmp}/$targz_filename";
+        $tar_filepath = str_replace('.gz', '', $targz_filepath);
+        $untarred_dirpath = str_replace('.tar', '', $tar_filepath);
+        if (!file_exists($targz_filepath)) {
             file_put_contents(
-                $tarball_filepath,
+                $targz_filepath,
                 fopen(
-                    "https://ftp.drupal.org/files/projects/$tarball_filename",
+                    "https://ftp.drupal.org/files/projects/$targz_filename",
                     'r'
                 )
             );
         }
         if (!file_exists($untarred_dirpath)) {
-            $this->fs->remove([
-                $tar_filepath,
-                $untarred_dirpath,
-            ]);
-            $p = new \PharData($tarball_filepath);
-            $p->decompress();
-            $phar = new \PharData($tar_filepath);
-            $phar->extractTo($untarred_dirpath);
+            $zippy = Zippy::load();
+            $archive = $zippy->open($targz_filepath);
+            $archive->extract($this->tmp);
         }
+
+        return $untarred_dirpath;
     }
 
     /**
@@ -100,21 +93,9 @@ class SandboxManager
         $sandbox
     ) {
         $drupal_project_string = "drupal-$drupal_version";
-        $tarball_filename = "$drupal_project_string.tar.gz";
-        $tarball_filepath = "$tmp/$tarball_filename";
-        $tar_filepath = "$tmp/drupal-8.tar";
-        $untarred_dirpath = "$tmp/drupal-8";
-
-        if (!file_exists("$untarred_dirpath/$drupal_project_string")) {
-            $this->downloadProjectFromDrupalOrg(
-                $tarball_filepath,
-                $tarball_filename,
-                $tar_filepath,
-                $untarred_dirpath
-            );
-        }
+         $this->downloadProjectFromDrupalOrg($drupal_project_string);
         $this->fs->mirror(
-            "$untarred_dirpath/$drupal_project_string",
+            "{$this->tmp}/drupal-$drupal_version",
             $sandbox . "/docroot"
         );
     }
@@ -126,20 +107,10 @@ class SandboxManager
     protected function downloadAndCopyCtools($tmp, $sandbox)
     {
         $ctools_version = '8.x-3.0';
-        $tarball_filename = "ctools-$ctools_version.tar.gz";
-        $tarball_filepath = "$tmp/$tarball_filename";
-        $tar_filepath = "$tmp/ctools-8.tar";
-        $untarred_dirpath = "$tmp/ctools-8";
-        if (!file_exists("$untarred_dirpath/$ctools_version")) {
-            $this->downloadProjectFromDrupalOrg(
-                $tarball_filepath,
-                $tarball_filename,
-                $tar_filepath,
-                $untarred_dirpath
-            );
-        }
+        $project_string = "ctools-$ctools_version";
+        $this->downloadProjectFromDrupalOrg($project_string);
         $this->fs->mirror(
-            "$untarred_dirpath/ctools",
+            "{$this->tmp}/ctools",
             $sandbox . "/docroot/modules/contrib/ctools"
         );
     }
