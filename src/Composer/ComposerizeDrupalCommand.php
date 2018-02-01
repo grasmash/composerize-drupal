@@ -61,6 +61,10 @@ class ComposerizeDrupalCommand extends BaseCommand
             $this->getIO()->write("Execute <comment>composer update</comment> to install dependencies.");
         }
 
+        if (!$exit_code) {
+            $this->printPostScript();
+        }
+
         return $exit_code;
     }
 
@@ -120,7 +124,7 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected function addRequirementsToComposerJson()
     {
         $root_composer_json = $this->loadRootComposerJson();
-        $this->requireModules($root_composer_json);
+        $this->requireContribProjects($root_composer_json);
         $this->requireDrupalCore($root_composer_json);
         ComposerJsonManipulator::writeObjectToJsonFile(
             $root_composer_json,
@@ -150,7 +154,7 @@ class ComposerizeDrupalCommand extends BaseCommand
     /**
      * @param $root_composer_json
      */
-    protected function requireModules($root_composer_json)
+    protected function requireContribProjects($root_composer_json)
     {
         $modules = DrupalInspector::findContribProjects($this->drupalRoot, "modules/contrib");
         $themes = DrupalInspector::findContribProjects($this->drupalRoot, "themes/contrib");
@@ -328,5 +332,14 @@ class ComposerizeDrupalCommand extends BaseCommand
         $version_constraint = "^" . $version;
 
         return $version_constraint;
+    }
+
+    protected function printPostScript() {
+        $this->getIO()->write("<info>Completed composerization of Drupal!</info>");
+        $this->getIO()->write("Please review relevant documentation on Drupal.org:");
+        $this->getIO()->write("<comment>https://www.drupal.org/docs/develop/using-composer/using-composer-to-manage-drupal-site-dependencies</comment>");
+        $this->getIO()->write("");
+        $this->getIO()->write("These additional resources may also be helpful:");
+        $this->getIO()->write("  * <comment>https://www.lullabot.com/articles/drupal-8-composer-best-practices</comment>");
     }
 }
