@@ -39,7 +39,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->composerConverterDir = dirname(dirname(__DIR__));
         $base_dir = $this->determineBaseDir();
         $this->setBaseDir($base_dir);
-      // @todo Allow this to be different.
+        // @todo Allow this to be different.
         $this->drupalRoot = $base_dir . "/docroot";
         $this->fs = new Filesystem();
         $this->drupalRootRelative = $this->fs->makePathRelative($this->drupalRoot, $this->baseDir);
@@ -71,8 +71,13 @@ class ComposerizeDrupalCommand extends BaseCommand
 
     protected function determineBaseDir()
     {
-        $composer = $this->getComposer(false);
-        if ($composer) {
+        try {
+          $composer = $this->getComposer(FALSE);
+        }
+        catch (\Exception $e) {
+
+        }
+        if (isset($composer)) {
             $composer_json = $this->getComposer(false)
             ->getConfig()
             ->getConfigSource()

@@ -24,11 +24,17 @@ class PluginTest extends CommandTestBase
      */
     public function testComposerCommandsAvailable($expected)
     {
+
+        $process = new Process('composer global config repositories.composerize-drupal path $(pwd)', $this->sandbox);
+        $process->run();
+        $process = new Process('composer global require grasmash/composerize-drupal "*@dev"', $this->sandbox);
+        $process->run();
         // Code executed in `composer list` is not counted under code coverage.
         $process = new Process('COMPOSER_ALLOW_XDEBUG=1 ./vendor/bin/composer list', $this->sandbox);
         $process->run();
         $this->assertContains($expected, $process->getOutput());
     }
+
     /**
      * Provides values to testComposerCommandsAvailable().
      *
