@@ -334,7 +334,8 @@ class ComposerizeDrupalCommand extends BaseCommand
         return $version_constraint;
     }
 
-    protected function printPostScript() {
+    protected function printPostScript()
+    {
         $this->getIO()->write("<info>Completed composerization of Drupal!</info>");
         $this->getIO()->write("Please review relevant documentation on Drupal.org:");
         $this->getIO()->write("<comment>https://www.drupal.org/docs/develop/using-composer/using-composer-to-manage-drupal-site-dependencies</comment>");
