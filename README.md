@@ -17,6 +17,13 @@ The `composerize-drupal` command will perform the following operations:
         * `[drupal-root]/modules/contrib`
         * `[drupal-root]/themes/contrib`
         * `[drupal-root]/profiles/contrib`
+    * Require and configure suggested Composer plugins:
+        * Add [Composer Installer](https://github.com/grasmash/composerize-drupal) file paths to `extra` configuration.
+        * Merge dependencies from `[drupal-root]/modules/custom/*/composer.json` into your root dependencies via [Composer Merge](https://github.com/wikimedia/composer-merge-plugin)
+        * Create an empty `extra.patches` object to facilitate patching with [Composer Patches](https://github.com/cweagans/composer-patches)
+      * Add entries to `repositories`:
+        * `https://packages.drupal.org/8` for installing packages from Drupal.org
+        * [`https://asset-packagist.org/`](https://asset-packagist.org/) to permit installing NPM packages.
 * Create or modify `[composer-root]/.gitignore` with entries for Composer-managed contributed projects as [per best practices](https://getcomposer.org/doc/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md). You can modify `.gitignore` after composerization if you'd prefer not to follow this practice.
 * Execute `composer update` to generate `composer.lock`, autoload files, and install all dependencies in the correct locations.
 
