@@ -2,6 +2,10 @@
 
 # Composerize Drupal
 
+_Composerize Drupal_ is a Composer plugin that converts a non-Composer-managed Drupal application (e.g., one created via tarball) to a Composer-managed Drupal application.
+
+It is not for creating new Drupal applications. If you want to create a brand new Drupal application, use [drupal-project](https://github.com/drupal-composer/drupal-project) instead.
+
 To install:
 
 ```
@@ -33,7 +37,7 @@ composer composerize-drupal --composer-root=. --drupal-root=.
 The `composerize-drupal` command will perform the following operations:
 
 * Remove all vestigial `composer.json` and `composer.lock` files
-* Generate a new `composer.json` in the `[composer-root]` directory based on [template.composer.json](composer.template.json)
+* Generate a new `composer.json` in the `[composer-root]` directory based on [template.composer.json](template.composer.json)
     * Populate `require` with an entry for `drupal/core`
     * Populate `require` with an entry for each project in:
         * `[drupal-root]/modules/contrib`
