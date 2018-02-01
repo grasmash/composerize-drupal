@@ -5,41 +5,11 @@ namespace Grasmash\ComposerConverter\Utility;
 class ComposerJsonManipulator
 {
 
-
-  /**
-   * @param object $composer_json1
-   * @param object $composer_json2
-   *
-   * @return mixed
-   */
-    public static function merge($composer_json1, $composer_json2)
-    {
-        $composer_json1_string = json_encode($composer_json1);
-        $composer_json1_array = json_decode($composer_json1_string, true);
-        $composer_json2_string = json_encode($composer_json2);
-        $composer_json2_array = json_decode($composer_json2_string, true);
-
-        $merged_array = ArrayManipulator::arrayMergeRecursiveDistinct($composer_json1_array, $composer_json2_array);
-        $merged_composer_json_string = json_encode($merged_array);
-        $merged_composer_json = json_decode($merged_composer_json_string);
-
-      // Ensure that require and require-dev are objects and not arrays.
-        if (property_exists($merged_composer_json, 'require') && is_array($merged_composer_json->{'require'})) {
-            $merged_composer_json->{'require'} = (object) $merged_composer_json->{'require'};
-        }
-        if (property_exists($merged_composer_json, 'require-dev')&& is_array($merged_composer_json->{'require-dev'})) {
-            $merged_composer_json->{'require-dev'} = (object) $merged_composer_json->{'require-dev'};
-        }
-
-        return $merged_composer_json;
-    }
-
     public static function processPaths(&$template_composer_json, $drupal_root)
     {
         if ($drupal_root == '.') {
             $replacement = '';
-        }
-        else {
+        } else {
             $replacement = "$drupal_root/";
         }
         foreach ($template_composer_json->extra->{'installer-paths'} as $path => $types) {

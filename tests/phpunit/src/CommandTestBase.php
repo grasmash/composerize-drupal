@@ -9,7 +9,6 @@ use Webmozart\PathUtil\Path;
 
 abstract class CommandTestBase extends TestBase
 {
-
     /** @var \Grasmash\ComposerConverter\Tests\Application */
     protected $application;
 

@@ -22,6 +22,8 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
   /** @var \Grasmash\ComposerConverter\Tests\SandboxManager */
     protected $sandboxManager;
 
+    protected $drupalVersion;
+
   /**
    * {@inheritdoc}
    *
@@ -30,8 +32,9 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
+        $this->drupalVersion = '8.4.4';
         $this->fs = new Filesystem();
         $this->composerizeDrupalPath = dirname(dirname(dirname(__DIR__)));
-        $this->sandboxManager = new SandboxManager();
+        $this->sandboxManager = new SandboxManager($this->drupalVersion);
     }
 }

@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Composer\Command\BaseCommand;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 class ComposerizeDrupalCommand extends BaseCommand
 {
@@ -47,6 +48,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->fs = new Filesystem();
         $this->setDirectories($input);
         $this->drupalCoreVersion = $this->determineDrupalCoreVersion();
+        $this->removeAllComposerFiles();
         $this->createNewComposerJson();
         $this->addRequirementsToComposerJson();
         $this->mergeTemplateGitignore();
@@ -55,8 +57,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         if (!$input->getOption('no-update')) {
             $this->getIO()->write("Executing <comment>composer update</comment>...");
             $exit_code = $this->executeComposerUpdate();
-        }
-        else {
+        } else {
             $this->getIO()->write("Execute <comment>composer update</comment> to install dependencies.");
         }
 
@@ -109,9 +110,6 @@ class ComposerizeDrupalCommand extends BaseCommand
 
     protected function createNewComposerJson()
     {
-        if (file_exists($this->rootComposerJsonPath)) {
-            $this->fs->remove($this->rootComposerJsonPath);
-        }
         ComposerJsonManipulator::writeObjectToJsonFile(
             $this->getTemplateComposerJson(),
             $this->rootComposerJsonPath
@@ -135,7 +133,8 @@ class ComposerizeDrupalCommand extends BaseCommand
      *
      * @throws \Exception
      */
-    protected function determineDrupalCoreVersion() {
+    protected function determineDrupalCoreVersion()
+    {
         if (file_exists($this->drupalRoot . "/core/lib/Drupal.php")) {
             $bootstrap =  file_get_contents($this->drupalRoot . "/core/lib/Drupal.php");
             preg_match('|(const VERSION = \')(\d\.\d\.\d)\';|', $bootstrap, $matches);
@@ -151,44 +150,59 @@ class ComposerizeDrupalCommand extends BaseCommand
     /**
      * @param $root_composer_json
      */
-    protected function requireModules($root_composer_json) {
+    protected function requireModules($root_composer_json)
+    {
         $modules = DrupalInspector::findModules($this->drupalRoot);
         foreach ($modules as $module => $version) {
             $package_name = "drupal/$module";
-            $version_constraint = "^" . $version;
+            $version_constraint = $this->getVersionConstraint($version);
             $root_composer_json->require->{$package_name} = $version_constraint;
             $this->getIO()->write("<info>Added $package_name $version_constraint to requirements.</info>");
         }
     }
 
-    protected function setDirectories(InputInterface $input) {
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     */
+    protected function setDirectories(InputInterface $input)
+    {
         $this->composerConverterDir = dirname(dirname(__DIR__));
         $drupalFinder = new DrupalFinder();
         $this->determineDrupalRoot($input, $drupalFinder);
         $this->determineComposerRoot($input, $drupalFinder);
-        $this->drupalRootRelative = trim($this->fs->makePathRelative($this->drupalRoot,
-            $this->baseDir), '/');
+        $this->drupalRootRelative = trim($this->fs->makePathRelative(
+            $this->drupalRoot,
+            $this->baseDir
+        ), '/');
         $this->rootComposerJsonPath = $this->baseDir . "/composer.json";
     }
 
     /**
      * @return int
      */
-    protected function executeComposerUpdate() {
+    protected function executeComposerUpdate()
+    {
         $io = $this->getIO();
         $executor = new ProcessExecutor($io);
         $output_callback = function ($type, $buffer) use ($io) {
-            $io->write($buffer, FALSE);
+            $io->write($buffer, false);
         };
-        return $executor->execute('composer update', $output_callback);
+        return $executor->execute('composer update', $output_callback, $this->baseDir);
     }
 
-    protected function mergeTemplateGitignore() {
+    /**
+     *
+     */
+    protected function mergeTemplateGitignore()
+    {
         $template_gitignore = file($this->composerConverterDir . "/template.gitignore");
         $gitignore_entries = [];
         foreach ($template_gitignore as $key => $line) {
-            $gitignore_entries[] = str_replace('[drupal-root]',
-                $this->drupalRootRelative, $line);
+            $gitignore_entries[] = str_replace(
+                '[drupal-root]',
+                $this->drupalRootRelative,
+                $line
+            );
         }
         $root_gitignore_path = $this->getBaseDir() . "/.gitignore";
         $verb = "modified";
@@ -203,8 +217,10 @@ class ComposerizeDrupalCommand extends BaseCommand
             }
         }
         $merged_gitignore = $root_gitignore + $gitignore_entries;
-        file_put_contents($root_gitignore_path,
-            implode('', $merged_gitignore));
+        file_put_contents(
+            $root_gitignore_path,
+            implode('', $merged_gitignore)
+        );
 
         $this->getIO()->write("<info>$verb .gitignore. Composer dependencies will NOT be committed.</info>");
     }
@@ -212,8 +228,9 @@ class ComposerizeDrupalCommand extends BaseCommand
     /**
      * @param $root_composer_json
      */
-    protected function requireDrupalCore($root_composer_json) {
-        $version_constraint = "^" . $this->drupalCoreVersion;
+    protected function requireDrupalCore($root_composer_json)
+    {
+        $version_constraint = $this->getVersionConstraint($this->drupalCoreVersion);
         $root_composer_json->require->{'drupal/core'} = $version_constraint;
         $this->getIO()
             ->write("<info>Added drupal/core $version_constraint to requirements.</info>");
@@ -232,12 +249,10 @@ class ComposerizeDrupalCommand extends BaseCommand
         if ($input->getOption('composer-root')) {
             if (!$this->fs->isAbsolutePath($input->getOption('composer-root'))) {
                 $this->baseDir = getcwd() . "/" . $input->getOption('composer-root');
-            }
-            else {
+            } else {
                 $this->baseDir = $input->getOption('composer-root');
             }
-        }
-        else {
+        } else {
             $this->baseDir = $drupalFinder->getComposerRoot();
             $confirm = $this->getIO()
                 ->askConfirmation("<question>Assuming that composer.json should be generated at {$this->baseDir}. Is this correct?</question> ");
@@ -253,13 +268,61 @@ class ComposerizeDrupalCommand extends BaseCommand
      *
      * @throws \Exception
      */
-    protected function determineDrupalRoot(InputInterface $input, DrupalFinder $drupalFinder) {
-        $working_dir = $input->getOption('drupal-root') ?: getcwd();
-        if ($drupalFinder->locateRoot($working_dir)) {
-            $this->drupalRoot = $drupalFinder->getDrupalRoot();
+    protected function determineDrupalRoot(InputInterface $input, DrupalFinder $drupalFinder)
+    {
+        if (!$input->getOption('drupal-root')) {
+            $common_drupal_root_subdirs = [
+                'docroot',
+                'web',
+                'htdocs',
+            ];
+            $root = getcwd();
+            foreach ($common_drupal_root_subdirs as $candidate) {
+                if (file_exists("$root/$candidate")) {
+                    $root = "$root/$candidate";
+                    break;
+                }
+            }
+        } else {
+            $root = $input->getOption('drupal-root');
         }
-        else {
+
+        if ($drupalFinder->locateRoot($root)) {
+            $this->drupalRoot = $drupalFinder->getDrupalRoot();
+            if (!$this->fs->isAbsolutePath($root)) {
+                $this->drupalRoot = getcwd() . "/$root";
+            }
+        } else {
             throw new \Exception("Unable to find Drupal root directory. Please change directories to a valid Drupal 8 application. Try specifying it with --drupal-root.");
         }
+    }
+
+    /**
+     * Removes all composer.json and composer.lock files recursively.
+     */
+    protected function removeAllComposerFiles()
+    {
+        $finder = new Finder();
+        $finder->in($this->baseDir)
+            ->files()
+            ->name('/^composer\.(lock|json)$/');
+        $files = iterator_to_array($finder);
+        $this->fs->remove($files);
+    }
+
+    /**
+     * @param $version
+     *
+     * @return string
+     */
+    protected function getVersionConstraint($version)
+    {
+        if ($this->input->getOption('exact-versions')) {
+            return $version;
+        }
+
+        $version_constraint = "^" . $version;
+
+        return $version_constraint;
     }
 }

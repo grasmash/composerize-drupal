@@ -26,64 +26,66 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
 
     /**
      * Tests that composer.json contents are valid.
+     *
+     * This test will assume composer root is docroot, a default subdir that
+     * is automatically detected.
      */
-    public function testComposerJsonIsValid()
+    public function testNoSubdirAssumed()
     {
+        $this->sandbox = $this->sandbox . "/docroot";
         $args = [];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
 
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertNotContains('[drupal-root]', file_get_contents($this->sandbox . "/composer.json"));
-
-        $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
-
-        // Modules existing in codebase were added to composer.json.
-        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
-        $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
+        $this->assertCorrectFileGeneration('');
     }
 
     /**
-     * Test command when Drupal is not is a subdirectory like web or docroot.
+     * This command explicitly sets the composer root is docroot.
      */
-    public function testNoSubdirectory() {
+    public function testNoSubDirExplicit()
+    {
         $this->sandbox = $this->sandbox . "/docroot";
-        chdir($this->sandbox);
+        $args = [
+            '--composer-root' => 'docroot',
+            '--drupal-root' => 'docroot',
+            '--no-update' => true,
+        ];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+        $this->assertCorrectFileGeneration('');
+    }
+
+    /**
+     * Test command when Drupal is in a default subdirectory.
+     */
+    public function testSubdirAssumed()
+    {
         $args = [
             '--composer-root' => '.',
+            '--no-update' => true,
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertNotContains('[drupal-root]', file_get_contents($this->sandbox . "/composer.json"));
-
-        $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
-
-        // Modules existing in codebase were added to composer.json.
-        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
-        $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
+        $this->assertCorrectFileGeneration('docroot/');
+        $this->assertFileNotExists($this->sandbox . "/docroot/composer.json");
     }
 
     /**
-     * Test command when Drupal is in a subdirectory other than docroot.
+     * Test command when Drupal is in an explicitly defined subdir.
      */
-    public function testWeirdSubdirectory() {
+    public function testSubDirExplicit()
+    {
         $this->fs->rename($this->sandbox . "/docroot", $this->sandbox . "/drupal8");
         $args = [
+            '--composer-root' => '.',
             '--drupal-root' => 'drupal8',
+            '--no-update' => true,
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-
-        $this->assertEquals(0, $this->commandTester->getStatusCode());
-        $this->assertNotContains('[drupal-root]', file_get_contents($this->sandbox . "/composer.json"));
-
-        $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
-
-        // Modules existing in codebase were added to composer.json.
-        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
-        $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
+        $this->assertCorrectFileGeneration('drupal8/');
+        $this->assertFileNotExists($this->sandbox . "/drupal8/composer.json");
     }
 
     /**
@@ -91,7 +93,10 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testDrupalEndpoint()
     {
-        $args = [];
+        $args = [
+            '--composer-root' => '.',
+            '--no-update' => true,
+        ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
         $process = new Process('composer require drupal/token:1.1.0');
@@ -102,15 +107,49 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     }
 
     /**
-     * Tests that a composer.json file is created if none exists.
+     * @param $relative_drupal_root
      */
-    public function testComposerJsonIsCreated()
+    protected function assertCorrectFileGeneration($relative_drupal_root)
     {
-        $this->fs->remove($this->sandbox . "/composer.json");
-        $args = [];
-        $options = [ 'interactive' => false ];
-        $this->commandTester->execute($args, $options);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertNotContains(
+            '[drupal-root]',
+            file_get_contents($this->sandbox . "/composer.json")
+        );
 
-        $this->assertFileExists($this->sandbox . "/composer.json");
+        $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
+
+        // Modules existing in codebase were added to composer.json.
+        $this->assertObjectHasAttribute(
+            'drupal/ctools',
+            $composer_json->require
+        );
+        $this->assertEquals(
+            "^3.0.0",
+            $composer_json->require->{'drupal/ctools'}
+        );
+        $this->assertObjectHasAttribute(
+            'drupal/core',
+            $composer_json->require
+        );
+        $this->assertEquals(
+            "^" . $this->drupalVersion,
+            $composer_json->require->{'drupal/core'}
+        );
+
+        // Assert installer paths.
+        $this->assertObjectHasAttribute('installer-paths', $composer_json->extra);
+        $this->assertObjectHasAttribute('drush/contrib/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'core', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'modules/contrib/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'modules/custom/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'profiles/contrib/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'profiles/custom/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'themes/contrib/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'themes/custom/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute($relative_drupal_root . 'libraries/{$name}', $composer_json->extra->{'installer-paths'});
+
+        // Assert merge-plugin.
+        $this->assertContains($relative_drupal_root . "modules/custom/*/composer.json", $composer_json->extra->{'merge-plugin'}->include);
     }
 }
