@@ -152,9 +152,13 @@ class ComposerizeDrupalCommand extends BaseCommand
      */
     protected function requireModules($root_composer_json)
     {
-        $modules = DrupalInspector::findModules($this->drupalRoot);
-        foreach ($modules as $module => $version) {
-            $package_name = "drupal/$module";
+        $modules = DrupalInspector::findContribProjects($this->drupalRoot, "modules/contrib");
+        $themes = DrupalInspector::findContribProjects($this->drupalRoot, "themes/contrib");
+        $profiles = DrupalInspector::findContribProjects($this->drupalRoot, "profiles/contrib");
+
+        $projects = array_merge($modules, $themes, $profiles);
+        foreach ($projects as $project => $version) {
+            $package_name = "drupal/$project";
             $version_constraint = $this->getVersionConstraint($version);
             $root_composer_json->require->{$package_name} = $version_constraint;
             $this->getIO()->write("<info>Added $package_name $version_constraint to requirements.</info>");

@@ -8,29 +8,29 @@ use Symfony\Component\Yaml\Yaml;
 class DrupalInspector
 {
 
-    public static function findModules($drupal_root)
+    public static function findContribProjects($drupal_root, $subdir)
     {
-        if (!file_exists($drupal_root . "/modules/contrib")) {
+        if (!file_exists($drupal_root . "/" . $subdir)) {
             return [];
         }
 
         $finder = new Finder();
-        $finder->in([$drupal_root . "/modules/contrib"])
+        $finder->in([$drupal_root . "/" . $subdir])
         ->name('*.info.yml')
         ->depth('== 1')
         ->files();
 
-        $modules = [];
+        $projects = [];
         foreach ($finder as $fileInfo) {
             $path = $fileInfo->getPathname();
             $filename_parts = explode('.', $fileInfo->getFilename());
-            $module_machine_name = $filename_parts[0];
+            $machine_name = $filename_parts[0];
             $module_info = Yaml::parseFile($path);
             $semantic_verision = self::getSemanticVersion($module_info['version']);
-            $modules[$module_machine_name] = $semantic_verision;
+            $projects[$machine_name] = $semantic_verision;
         }
 
-        return $modules;
+        return $projects;
     }
 
   /**

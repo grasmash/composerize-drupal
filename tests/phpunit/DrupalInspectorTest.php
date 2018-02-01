@@ -13,12 +13,12 @@ class DrupalInspectorTest extends TestBase
 {
 
   /**
-   * Tests DrupalInspector::findModules().
+   * Tests DrupalInspector::findContribProjects().
    */
     public function testFindModules()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $modules = DrupalInspector::findModules($this->sandbox . "/docroot");
+        $modules = DrupalInspector::findContribProjects($this->sandbox . "/docroot", "modules/contrib");
         $this->assertArrayHasKey('ctools', $modules);
         $this->assertContains('3.0.0', $modules);
     }

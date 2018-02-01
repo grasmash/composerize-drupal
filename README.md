@@ -33,3 +33,6 @@ composer composerize-drupal --composer-root=. --drupal-root=.
 The `composerize-drupal` command will perform the following operations:
 
 * Remove all vestigial `composer.json` and `composer.lock` files
+* Generate a new `composer.json` in the `[composer-root]` directory based on [template.composer.json](composer.template.json)
+    * Populate `require` with an entry for `drupal/core`
+    * Populate `require` with an entry for each module is `[drupal-root]/modules/contrib`

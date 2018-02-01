@@ -57,7 +57,8 @@ class SandboxManager
         return $sandbox;
     }
 
-    protected function downloadProjectFromDrupalOrg($project_string) {
+    protected function downloadProjectFromDrupalOrg($project_string)
+    {
         $targz_filename = "$project_string.tar.gz";
         $targz_filepath = "{$this->tmp}/$targz_filename";
         $tar_filepath = str_replace('.gz', '', $targz_filepath);
