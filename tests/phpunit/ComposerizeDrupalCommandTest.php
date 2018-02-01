@@ -22,6 +22,8 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $this->commandTester = new CommandTester($this->command);
     }
 
+    // @todo Test --drupal-root option.
+
     /**
      * Tests that composer.json contents are valid.
      */
@@ -40,6 +42,50 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
         $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
     }
+
+    /**
+     * Test command when Drupal is not is a subdirectory like web or docroot.
+     */
+    public function testNoSubdirectory() {
+        $this->sandbox = $this->sandbox . "/docroot";
+        chdir($this->sandbox);
+        $args = [
+            '--composer-root' => '.',
+        ];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertNotContains('[drupal-root]', file_get_contents($this->sandbox . "/composer.json"));
+
+        $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
+
+        // Modules existing in codebase were added to composer.json.
+        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
+        $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
+    }
+
+    /**
+     * Test command when Drupal is in a subdirectory other than docroot.
+     */
+    public function testWeirdSubdirectory() {
+        $this->fs->rename($this->sandbox . "/docroot", $this->sandbox . "/drupal8");
+        $args = [
+            '--drupal-root' => 'drupal8',
+        ];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $this->assertNotContains('[drupal-root]', file_get_contents($this->sandbox . "/composer.json"));
+
+        $composer_json = json_decode(file_get_contents($this->sandbox . "/composer.json"));
+
+        // Modules existing in codebase were added to composer.json.
+        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->require);
+        $this->assertEquals("^3.0.0", $composer_json->require->{'drupal/ctools'});
+    }
+
     /**
      * Tests modules can be downloaded from Drupal.org.
      */

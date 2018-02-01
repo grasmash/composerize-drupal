@@ -2,10 +2,12 @@
 
 namespace Grasmash\ComposerConverter\Composer;
 
-use Grasmash\ComposerConverter\Utility\ArrayManipulator;
+use Composer\Util\ProcessExecutor;
+use DrupalFinder\DrupalFinder;
 use Grasmash\ComposerConverter\Utility\ComposerJsonManipulator;
 use Grasmash\ComposerConverter\Utility\DrupalInspector;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Composer\Command\BaseCommand;
 use Symfony\Component\Filesystem\Filesystem;
@@ -13,21 +15,26 @@ use Symfony\Component\Filesystem\Filesystem;
 class ComposerizeDrupalCommand extends BaseCommand
 {
 
+    /** @var InputInterface */
+    protected $input;
     protected $baseDir;
     protected $composerConverterDir;
     protected $templateComposerJson;
     protected $rootComposerJsonPath;
     protected $drupalRoot;
     protected $drupalRootRelative;
+    protected $drupalCoreVersion;
+    /** @var Filesystem */
     protected $fs;
 
     public function configure()
     {
         $this->setName('composerize-drupal');
         $this->setDescription("Convert a non-Composer managed Drupal application into a Composer-managed application.");
-
-      // @todo add --drupal-root param.
-      // @todo add --exact-versions param.
+        $this->addOption('composer-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the directory that should contain composer.json.');
+        $this->addOption('drupal-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the Drupal root directory.');
+        $this->addOption('exact-versions', null, InputOption::VALUE_NONE, 'Use exact version constraints rather than the recommended caret operator.');
+        $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation.');
     }
 
   /**
@@ -36,24 +43,24 @@ class ComposerizeDrupalCommand extends BaseCommand
    */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->composerConverterDir = dirname(dirname(__DIR__));
-        $base_dir = $this->determineBaseDir();
-        $this->setBaseDir($base_dir);
-        // @todo Allow this to be different.
-        $this->drupalRoot = $base_dir . "/docroot";
+        $this->input = $input;
         $this->fs = new Filesystem();
-        $this->drupalRootRelative = $this->fs->makePathRelative($this->drupalRoot, $this->baseDir);
-        $this->rootComposerJsonPath = $this->baseDir . "/composer.json";
+        $this->setDirectories($input);
+        $this->drupalCoreVersion = $this->determineDrupalCoreVersion();
+        $this->createNewComposerJson();
+        $this->addRequirementsToComposerJson();
+        $this->mergeTemplateGitignore();
 
-        if (!file_exists($this->rootComposerJsonPath)) {
-            $this->createNewComposerJson();
-        } else {
-            $this->mergeTemplateIntoRootComposerJson();
+        $exit_code = 0;
+        if (!$input->getOption('no-update')) {
+            $this->getIO()->write("Executing <comment>composer update</comment>...");
+            $exit_code = $this->executeComposerUpdate();
+        }
+        else {
+            $this->getIO()->write("Execute <comment>composer update</comment> to install dependencies.");
         }
 
-        $this->addDrupalModulesToComposerJson();
-
-      // @todo Add to .gitignore.
+        return $exit_code;
     }
 
   /**
@@ -66,26 +73,6 @@ class ComposerizeDrupalCommand extends BaseCommand
         }
 
         return $this->templateComposerJson;
-    }
-
-
-    protected function determineBaseDir()
-    {
-        try {
-            $composer = $this->getComposer(false);
-        } catch (\Exception $e) {
-        }
-        if (isset($composer)) {
-            $composer_json = $this->getComposer(false)
-            ->getConfig()
-            ->getConfigSource()
-            ->getName();
-            $base_dir = dirname($composer_json);
-        } else {
-            $base_dir = getcwd();
-        }
-
-        return $base_dir;
     }
 
   /**
@@ -120,37 +107,159 @@ class ComposerizeDrupalCommand extends BaseCommand
         return json_decode(file_get_contents($this->rootComposerJsonPath));
     }
 
-    protected function mergeTemplateIntoRootComposerJson()
-    {
-        $root_composer_json = $this->loadRootComposerJson();
-        $template_composer_json = $this->getTemplateComposerJson();
-        $merged_composer_json = ComposerJsonManipulator::merge(
-            $root_composer_json,
-            $template_composer_json
-        );
-        ComposerJsonManipulator::writeObjectToJsonFile($merged_composer_json, $this->rootComposerJsonPath);
-    }
-
     protected function createNewComposerJson()
     {
+        if (file_exists($this->rootComposerJsonPath)) {
+            $this->fs->remove($this->rootComposerJsonPath);
+        }
         ComposerJsonManipulator::writeObjectToJsonFile(
             $this->getTemplateComposerJson(),
             $this->rootComposerJsonPath
         );
+        $this->getIO()->write("<info>Created composer.json</info>");
     }
 
-    protected function addDrupalModulesToComposerJson()
+    protected function addRequirementsToComposerJson()
     {
-        $modules = DrupalInspector::findModules($this->drupalRoot);
         $root_composer_json = $this->loadRootComposerJson();
-        foreach ($modules as $module => $version) {
-            $package_name = "drupal/$module";
-            $version_constraint = "^" . $version;
-            $root_composer_json->require->{$package_name} = $version_constraint;
-        }
+        $this->requireModules($root_composer_json);
+        $this->requireDrupalCore($root_composer_json);
         ComposerJsonManipulator::writeObjectToJsonFile(
             $root_composer_json,
             $this->rootComposerJsonPath
         );
+    }
+
+    /**
+     * @param $matches
+     *
+     * @throws \Exception
+     */
+    protected function determineDrupalCoreVersion() {
+        if (file_exists($this->drupalRoot . "/core/lib/Drupal.php")) {
+            $bootstrap =  file_get_contents($this->drupalRoot . "/core/lib/Drupal.php");
+            preg_match('|(const VERSION = \')(\d\.\d\.\d)\';|', $bootstrap, $matches);
+            if (array_key_exists(2, $matches)) {
+                return $matches[2];
+            }
+        }
+        if (!isset($this->drupalCoreVersion)) {
+            throw new \Exception("Unable to determine Drupal core version.");
+        }
+    }
+
+    /**
+     * @param $root_composer_json
+     */
+    protected function requireModules($root_composer_json) {
+        $modules = DrupalInspector::findModules($this->drupalRoot);
+        foreach ($modules as $module => $version) {
+            $package_name = "drupal/$module";
+            $version_constraint = "^" . $version;
+            $root_composer_json->require->{$package_name} = $version_constraint;
+            $this->getIO()->write("<info>Added $package_name $version_constraint to requirements.</info>");
+        }
+    }
+
+    protected function setDirectories(InputInterface $input) {
+        $this->composerConverterDir = dirname(dirname(__DIR__));
+        $drupalFinder = new DrupalFinder();
+        $this->determineDrupalRoot($input, $drupalFinder);
+        $this->determineComposerRoot($input, $drupalFinder);
+        $this->drupalRootRelative = trim($this->fs->makePathRelative($this->drupalRoot,
+            $this->baseDir), '/');
+        $this->rootComposerJsonPath = $this->baseDir . "/composer.json";
+    }
+
+    /**
+     * @return int
+     */
+    protected function executeComposerUpdate() {
+        $io = $this->getIO();
+        $executor = new ProcessExecutor($io);
+        $output_callback = function ($type, $buffer) use ($io) {
+            $io->write($buffer, FALSE);
+        };
+        return $executor->execute('composer update', $output_callback);
+    }
+
+    protected function mergeTemplateGitignore() {
+        $template_gitignore = file($this->composerConverterDir . "/template.gitignore");
+        $gitignore_entries = [];
+        foreach ($template_gitignore as $key => $line) {
+            $gitignore_entries[] = str_replace('[drupal-root]',
+                $this->drupalRootRelative, $line);
+        }
+        $root_gitignore_path = $this->getBaseDir() . "/.gitignore";
+        $verb = "modified";
+        if (!file_exists($root_gitignore_path)) {
+            $verb = "created";
+            $this->fs->touch($root_gitignore_path);
+        }
+        $root_gitignore = file($root_gitignore_path);
+        foreach ($root_gitignore as $key => $line) {
+            if ($key_to_remove = array_search($line, $gitignore_entries)) {
+                unset($gitignore_entries[$key_to_remove]);
+            }
+        }
+        $merged_gitignore = $root_gitignore + $gitignore_entries;
+        file_put_contents($root_gitignore_path,
+            implode('', $merged_gitignore));
+
+        $this->getIO()->write("<info>$verb .gitignore. Composer dependencies will NOT be committed.</info>");
+    }
+
+    /**
+     * @param $root_composer_json
+     */
+    protected function requireDrupalCore($root_composer_json) {
+        $version_constraint = "^" . $this->drupalCoreVersion;
+        $root_composer_json->require->{'drupal/core'} = $version_constraint;
+        $this->getIO()
+            ->write("<info>Added drupal/core $version_constraint to requirements.</info>");
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param DrupalFinder $drupalFinder
+     *
+     * @throws \Exception
+     */
+    protected function determineComposerRoot(
+        InputInterface $input,
+        DrupalFinder $drupalFinder
+    ) {
+        if ($input->getOption('composer-root')) {
+            if (!$this->fs->isAbsolutePath($input->getOption('composer-root'))) {
+                $this->baseDir = getcwd() . "/" . $input->getOption('composer-root');
+            }
+            else {
+                $this->baseDir = $input->getOption('composer-root');
+            }
+        }
+        else {
+            $this->baseDir = $drupalFinder->getComposerRoot();
+            $confirm = $this->getIO()
+                ->askConfirmation("<question>Assuming that composer.json should be generated at {$this->baseDir}. Is this correct?</question> ");
+            if (!$confirm) {
+                throw new \Exception("Please use --composer-root to specify the correct Composer root directory");
+            }
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param DrupalFinder $drupalFinder
+     *
+     * @throws \Exception
+     */
+    protected function determineDrupalRoot(InputInterface $input, DrupalFinder $drupalFinder) {
+        $working_dir = $input->getOption('drupal-root') ?: getcwd();
+        if ($drupalFinder->locateRoot($working_dir)) {
+            $this->drupalRoot = $drupalFinder->getDrupalRoot();
+        }
+        else {
+            throw new \Exception("Unable to find Drupal root directory. Please change directories to a valid Drupal 8 application. Try specifying it with --drupal-root.");
+        }
     }
 }

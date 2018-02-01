@@ -1,0 +1,6 @@
+[drupal-root]/core
+[drupal-root]/modules/contrib
+[drupal-root]/themes/contrib
+[drupal-root]/profiles/contrib
+[drupal-root]/libraries
+vendor

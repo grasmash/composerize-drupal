@@ -1,10 +1,10 @@
-
 {
   "name": "grasmash/composerize-drupal",
   "description": "Convert a non-Composer managed Drupal application into a Composer-managed application.",
   "type": "composer-plugin",
   "require": {
     "composer-plugin-api": "^1.0.0",
+    "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3"
   },
   "require-dev": {

@@ -10,6 +10,10 @@ class DrupalInspector
 
     public static function findModules($drupal_root)
     {
+        if (!file_exists($drupal_root . "/modules/contrib")) {
+            return [];
+        }
+
         $finder = new Finder();
         $finder->in([$drupal_root . "/modules/contrib"])
         ->name('*.info.yml')
