@@ -17,8 +17,8 @@ The `composerize-drupal` command will perform the following operations:
         * `[drupal-root]/modules/contrib`
         * `[drupal-root]/themes/contrib`
         * `[drupal-root]/profiles/contrib`
-* Create or modify `[composer-root]/.gitignore]` with entries for Composer-managed contributed projects as [per best practices](https://getcomposer.org/doc/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md). You can modify `.gitignore` after composerization if you'd prefer not to follow this practice.
-* Executed `composer update` to generate `composer.lock`, autoload files, and install all dependencies in the correct locations.
+* Create or modify `[composer-root]/.gitignore` with entries for Composer-managed contributed projects as [per best practices](https://getcomposer.org/doc/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md). You can modify `.gitignore` after composerization if you'd prefer not to follow this practice.
+* Execute `composer update` to generate `composer.lock`, autoload files, and install all dependencies in the correct locations.
 
 ## Installation
 
@@ -53,4 +53,4 @@ composer composerize-drupal --composer-root=. --drupal-root=.
 * `--composer-root`: Specifies the root directory of your project where `composer.json` will be generated. This should be the root of your Git repository, where `.git` is located.
 * `--drupal-root`: Specifies the Drupal root directory where `index.php` is located.
 * `--no-update`: Prevents `composer update` from being automatically run after `composer.json` is generated.
-* `--exact-versions`: Will cause Drupal core and contributed projects (modules, themes, profiles) with exact verions constraints in `composer.json` rather than using the default caret operator. E.g., a Drupal core would be required as `8.4.4` rather than `^8.4.4`. This prevents projects from being updated.
+* `--exact-versions`: Will cause Drupal core and contributed projects (modules, themes, profiles) to be be required with exact verions constraints in `composer.json`, rather than using the default caret operator. E.g., a `drupal/core` would be required as `8.4.4` rather than `^8.4.4`. This prevents projects from being updated. It is not recommended as a long-term solution, but may help you convert to using Composer more easily by reducing the size of the change to your project.
