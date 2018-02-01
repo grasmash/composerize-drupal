@@ -13,26 +13,11 @@ class DrupalInspectorTest extends TestBase
 {
 
   /**
-   *
-   */
-    protected function mergeTemplateIntoSandbox()
-    {
-        $composer_json1_path = $this->sandbox . "/composer.json";
-        $composer_json1 = json_decode(file_get_contents($composer_json1_path));
-        $composer_json2_path = dirname(dirname(__DIR__)) . "/template.composer.json";
-        $composer_json2 = json_decode(file_get_contents($composer_json2_path));
-        ComposerJsonManipulator::processPaths($composer_json2, "docroot");
-        $merged = ComposerJsonManipulator::merge($composer_json1, $composer_json2);
-        file_put_contents($composer_json1_path, json_encode($merged, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-    }
-
-  /**
    * Tests DrupalInspector::findModules().
    */
     public function testFindModules()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $this->mergeTemplateIntoSandbox();
         $modules = DrupalInspector::findModules($this->sandbox . "/docroot");
         $this->assertArrayHasKey('ctools', $modules);
         $this->assertContains('3.0.0', $modules);
