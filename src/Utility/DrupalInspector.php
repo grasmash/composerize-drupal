@@ -26,8 +26,13 @@ class DrupalInspector
             $filename_parts = explode('.', $fileInfo->getFilename());
             $machine_name = $filename_parts[0];
             $module_info = Yaml::parseFile($path);
-            $semantic_verision = self::getSemanticVersion($module_info['version']);
-            $projects[$machine_name] = $semantic_verision;
+            if (array_key_exists('version', $module_info)) {
+                $semantic_verision = self::getSemanticVersion($module_info['version']);
+                $projects[$machine_name] = $semantic_verision;
+            }
+            else {
+                print_r($module_info);
+            }
         }
 
         return $projects;
