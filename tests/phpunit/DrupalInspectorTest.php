@@ -18,7 +18,8 @@ class DrupalInspectorTest extends TestBase
     public function testFindModules()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $modules = DrupalInspector::findContribProjects($this->sandbox . "/docroot", "modules/contrib");
+        $composer_json = json_decode(file_get_contents($this->sandbox . "/docroot/composer.json"));
+        $modules = DrupalInspector::findContribProjects($this->sandbox . "/docroot", "modules/contrib", $composer_json);
         $this->assertArrayHasKey('ctools', $modules);
         $this->assertContains('3.0.0', $modules);
     }
