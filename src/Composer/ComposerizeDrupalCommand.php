@@ -168,18 +168,17 @@ class ComposerizeDrupalCommand extends BaseCommand
 
             if ($version_constraint == "*") {
                 $this->getIO()->write("<comment>Could not determine correct version for project $package_name. Added to requirements without constraint.</comment>");
-            }
-            else {
+            } else {
                 $this->getIO()->write("<info>Added $package_name version $version_constraint to requirements.</info>");
             }
-
         }
     }
 
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
      */
-     protected function setDirectories(InputInterface $input) {
+    protected function setDirectories(InputInterface $input)
+    {
         $this->composerConverterDir = dirname(dirname(__DIR__));
         $drupalFinder = new DrupalFinder();
         $this->determineDrupalRoot($input, $drupalFinder);
@@ -335,10 +334,9 @@ class ComposerizeDrupalCommand extends BaseCommand
             return $version;
         }
 
-        if ($version == NULL) {
+        if ($version == null) {
             $version_constraint = "*";
-        }
-        else {
+        } else {
             $version_constraint = "^" . $version;
         }
 

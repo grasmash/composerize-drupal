@@ -26,22 +26,21 @@ class DrupalInspector
             $filename_parts = explode('.', $fileInfo->getFilename());
             $machine_name = $filename_parts[0];
             $module_info = Yaml::parseFile($path);
-            $semantic_version = FALSE;
+            $semantic_version = false;
             // Grab version from module yaml file.
             if (array_key_exists('version', $module_info)) {
                 $semantic_version = self::getSemanticVersion($module_info['version']);
-            }
-            // Dev versions of modules do not include version info in yaml files.
-            // Look in composer.json for a version constraint.
-            else {
+            } else {
+                // Dev versions of modules do not include version info in yaml files.
+                // Look in composer.json for a version constraint.
                 if (array_key_exists('drupal/' . $machine_name, $composer_json->require)) {
                     $version_constraint = $composer_json['require']['drupal/' . $machine_name];
                     $semantic_version = self::getSemanticVersion($version_constraint);
                 }
             }
 
-            if ($semantic_version === FALSE) {
-                $semantic_version = NULL;
+            if ($semantic_version === false) {
+                $semantic_version = null;
             }
             $projects[$machine_name] = $semantic_version;
         }
