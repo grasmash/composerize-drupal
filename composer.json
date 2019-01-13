@@ -4,6 +4,7 @@
   "type": "composer-plugin",
   "require": {
     "composer-plugin-api": "^1.0.0",
+    "symfony/finder": "^3.4",
     "symfony/yaml": "^3.4",
     "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3"

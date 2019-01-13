@@ -32,7 +32,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->drupalVersion = '8.4.4';
+        $this->drupalVersion = '8.6.4';
         $this->fs = new Filesystem();
         $this->composerizeDrupalPath = dirname(dirname(dirname(__DIR__)));
         $this->sandboxManager = new SandboxManager($this->drupalVersion);

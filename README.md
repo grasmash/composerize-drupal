@@ -18,8 +18,8 @@ The `composerize-drupal` command will perform the following operations:
         * `[drupal-root]/themes/contrib`
         * `[drupal-root]/profiles/contrib`
     * Require and configure suggested Composer plugins:
-        * Add [Composer Installer](https://github.com/grasmash/composerize-drupal) file paths to `extra` configuration.
-        * Merge dependencies from `[drupal-root]/modules/custom/*/composer.json` into your root dependencies via [Composer Merge](https://github.com/wikimedia/composer-merge-plugin)
+        * Add [Composer Installer](https://github.com/grasmash/composerize-drupal) file paths to `extra` configuration to ensure that Drupal projects are downloaded to the correct locations.
+        * Merge dependencies from `[drupal-root]/modules/custom/*/composer.json` into your root dependencies via [Composer Merge](https://github.com/wikimedia/composer-merge-plugin), permitting custom modules to have separate `composer.json` files.
         * Create an empty `extra.patches` object to facilitate patching with [Composer Patches](https://github.com/cweagans/composer-patches)
       * Add entries to `repositories`:
         * `https://packages.drupal.org/8` for installing packages from Drupal.org
