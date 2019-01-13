@@ -156,24 +156,30 @@ class ComposerizeDrupalCommand extends BaseCommand
      */
     protected function requireContribProjects($root_composer_json)
     {
-        $modules = DrupalInspector::findContribProjects($this->drupalRoot, "modules/contrib");
-        $themes = DrupalInspector::findContribProjects($this->drupalRoot, "themes/contrib");
-        $profiles = DrupalInspector::findContribProjects($this->drupalRoot, "profiles/contrib");
+        $modules = DrupalInspector::findContribProjects($this->drupalRoot, "modules/contrib", $root_composer_json);
+        $themes = DrupalInspector::findContribProjects($this->drupalRoot, "themes/contrib", $root_composer_json);
+        $profiles = DrupalInspector::findContribProjects($this->drupalRoot, "profiles/contrib", $root_composer_json);
 
         $projects = array_merge($modules, $themes, $profiles);
         foreach ($projects as $project => $version) {
             $package_name = "drupal/$project";
             $version_constraint = $this->getVersionConstraint($version);
             $root_composer_json->require->{$package_name} = $version_constraint;
-            $this->getIO()->write("<info>Added $package_name $version_constraint to requirements.</info>");
+
+            if ($version_constraint == "*") {
+                $this->getIO()->write("<comment>Could not determine correct version for project $package_name. Added to requirements without constraint.</comment>");
+            }
+            else {
+                $this->getIO()->write("<info>Added $package_name version $version_constraint to requirements.</info>");
+            }
+
         }
     }
 
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
      */
-    protected function setDirectories(InputInterface $input)
-    {
+     protected function setDirectories(InputInterface $input) {
         $this->composerConverterDir = dirname(dirname(__DIR__));
         $drupalFinder = new DrupalFinder();
         $this->determineDrupalRoot($input, $drupalFinder);
@@ -329,7 +335,12 @@ class ComposerizeDrupalCommand extends BaseCommand
             return $version;
         }
 
-        $version_constraint = "^" . $version;
+        if ($version == NULL) {
+            $version_constraint = "*";
+        }
+        else {
+            $version_constraint = "^" . $version;
+        }
 
         return $version_constraint;
     }

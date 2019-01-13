@@ -8,7 +8,7 @@ use Symfony\Component\Yaml\Yaml;
 class DrupalInspector
 {
 
-    public static function findContribProjects($drupal_root, $subdir)
+    public static function findContribProjects($drupal_root, $subdir, $composer_json)
     {
         if (!file_exists($drupal_root . "/" . $subdir)) {
             return [];
@@ -21,22 +21,29 @@ class DrupalInspector
             ->files();
 
         $projects = [];
-        $invalid_versions = [];
         foreach ($finder as $fileInfo) {
             $path = $fileInfo->getPathname();
             $filename_parts = explode('.', $fileInfo->getFilename());
             $machine_name = $filename_parts[0];
             $module_info = Yaml::parseFile($path);
-            $semantic_version = self::getSemanticVersion($module_info['version']);
-            if ($semantic_version === false) {
-                $invalid_versions[] = $machine_name;
-            } else {
-                $projects[$machine_name] = $semantic_version;
+            $semantic_version = FALSE;
+            // Grab version from module yaml file.
+            if (array_key_exists('version', $module_info)) {
+                $semantic_version = self::getSemanticVersion($module_info['version']);
             }
-        }
+            // Dev versions of modules do not include version info in yaml files.
+            // Look in composer.json for a version constraint.
+            else {
+                if (array_key_exists('drupal/' . $machine_name, $composer_json->require)) {
+                    $version_constraint = $composer_json['require']['drupal/' . $machine_name];
+                    $semantic_version = self::getSemanticVersion($version_constraint);
+                }
+            }
 
-        if (!empty($invalid_versions)) {
-            throw new \Exception("The following projects contain invalid versions: " . implode(', ', $invalid_versions));
+            if ($semantic_version === FALSE) {
+                $semantic_version = NULL;
+            }
+            $projects[$machine_name] = $semantic_version;
         }
 
         return $projects;
