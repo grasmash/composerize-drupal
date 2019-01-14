@@ -139,7 +139,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
 
         // Assert installer paths.
         $this->assertObjectHasAttribute('installer-paths', $composer_json->extra);
-        $this->assertObjectHasAttribute('drush/contrib/{$name}', $composer_json->extra->{'installer-paths'});
+        $this->assertObjectHasAttribute('drush/Commands/{$name}', $composer_json->extra->{'installer-paths'});
         $this->assertObjectHasAttribute($relative_drupal_root . 'core', $composer_json->extra->{'installer-paths'});
         $this->assertObjectHasAttribute($relative_drupal_root . 'modules/contrib/{$name}', $composer_json->extra->{'installer-paths'});
         $this->assertObjectHasAttribute($relative_drupal_root . 'modules/custom/{$name}', $composer_json->extra->{'installer-paths'});
