@@ -1,5 +1,14 @@
 {
+  "name": "my/project",
+  "description": "Project template for Drupal 8 projects with composer",
   "type": "project",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "",
+      "role": ""
+    }
+  ],
   "repositories": {
     "drupal": {
       "type": "composer",
@@ -11,14 +20,27 @@
     }
   },
   "require": {
+    "php": "^5.5.9|>=7.0.8",
     "composer/installers": "^1.2.0",
-    "cweagans/composer-patches": "^1.6.4",
+    "cweagans/composer-patches": "^1.6.5",
+    "drupal-composer/drupal-scaffold": "^2.5.4",
     "oomphinc/composer-installers-extender": "^1.1",
     "wikimedia/composer-merge-plugin": "^1.4.1"
   },
   "require-dev": {},
+  "config": {
+    "sort-packages": true
+  },
+  "conflict": {
+    "drupal/drupal": "*"
+  },
   "extra": {
     "enable-patching": true,
+    "composer-exit-on-patch-failure": true,
+    "patchLevel": {
+      "drupal/core": "-p2"
+    },
+    "patches": [],
     "installer-types": ["bower-asset", "npm-asset"],
     "installer-paths": {
       "[drupal-root]/core": ["type:drupal-core"],
@@ -29,7 +51,7 @@
       "[drupal-root]/themes/contrib/{$name}": ["type:drupal-theme"],
       "[drupal-root]/themes/custom/{$name}": ["type:drupal-custom-theme"],
       "[drupal-root]/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"],
-      "drush/contrib/{$name}": ["type:drupal-drush"]
+      "drush/Commands/{$name}": ["type:drupal-drush"]
     },
     "merge-plugin": {
       "include": [
@@ -37,8 +59,7 @@
       ],
       "replace": false,
       "ignore-duplicates": true
-    },
-    "patches": {}
+    }
   },
   "minimum-stability": "dev",
   "prefer-stable": true
