@@ -330,17 +330,13 @@ class ComposerizeDrupalCommand extends BaseCommand
      */
     protected function getVersionConstraint($version)
     {
-        if ($this->input->getOption('exact-versions')) {
-            return $version;
-        }
-
         if ($version == null) {
-            $version_constraint = "*";
+            return "*";
+        } elseif ($this->input->getOption('exact-versions')) {
+            return $version;
         } else {
-            $version_constraint = "^" . $version;
+            return "^" . $version;
         }
-
-        return $version_constraint;
     }
 
     protected function printPostScript()

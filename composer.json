@@ -3,6 +3,7 @@
   "description": "Convert a non-Composer managed Drupal application into a Composer-managed application.",
   "type": "composer-plugin",
   "require": {
+    "php": ">=7.0",
     "composer-plugin-api": "^1.0.0",
     "symfony/finder": "^3.4",
     "symfony/yaml": "^3.4",
