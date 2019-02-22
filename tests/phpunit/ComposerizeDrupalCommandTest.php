@@ -28,6 +28,8 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      *
      * @param string $drupal_core_version
      *   The Drupal core version. E.g., 8.6.0.
+     * @param bool $success_expected
+     *   Whether we expect the command to succeed.
      *
      * @dataProvider providerTestDrupalCoreVersions
      */
@@ -38,7 +40,14 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $this->sandbox = $this->sandbox . "/docroot";
         $args = [];
         $options = [ 'interactive' => false ];
-        $exit_code = $this->commandTester->execute($args, $options);
+
+        $exit_code = NULL;
+        try {
+            $exit_code = $this->commandTester->execute($args, $options);
+        }
+        catch (\Exception $e) {
+
+        }
 
         if ($success_expected) {
             $this->assertEquals(0, $exit_code);
@@ -58,8 +67,8 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function providerTestDrupalCoreVersions()
     {
         return [
-            ['8.6.0', TRUE],
             ['8.6.x-dev', TRUE],
+            ['8.6.0', TRUE],
             // Invalid version.
             ['0.0.0', FALSE],
         ];
