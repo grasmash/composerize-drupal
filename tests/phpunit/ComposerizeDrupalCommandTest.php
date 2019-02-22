@@ -27,7 +27,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      * Tests various Drupal core versions with command.
      *
      * @param string $drupal_core_version
-     *   The Drupal core version. E.g., 8.6.0.
+     *   The Drupal core version. E.g., 8.6.0, 8.6.x-dev.
      *
      * @dataProvider providerTestDrupalCoreVersions
      */
@@ -39,6 +39,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $args = [];
         $options = [ 'interactive' => false ];
         $exit_code = $this->commandTester->execute($args, $options);
+
         $this->assertEquals(0, $exit_code);
         $this->assertCorrectFileGeneration('');
     }

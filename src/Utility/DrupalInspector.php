@@ -2,6 +2,7 @@
 
 namespace Grasmash\ComposerConverter\Utility;
 
+use Composer\Semver\Semver;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
@@ -99,19 +100,6 @@ class DrupalInspector
             return "*";
         }
         elseif (strstr($version, '-dev') !== FALSE) {
-            $num_dots = substr_count($version, '.');
-            // Matches 1.x-dev.
-            if ($num_dots == 1) {
-                return $version;
-            }
-            // Matches (core) version 8.6.11-dev.
-            elseif ($num_dots == 2) {
-                $version = str_replace('-dev', '', $version);
-                $pos1 = strpos($version, '.');
-                $pos2 = strpos($version, '.', $pos1 + 1);
-                $version = substr($version, 0, $pos1 + $pos2) . 'x-dev';
-            }
-
             return $version;
         }
         elseif ($exact_versions) {
@@ -140,10 +128,20 @@ class DrupalInspector
          */
         preg_match('#(const VERSION = \')(\d\.\d\.(\d{1,}|x)(-(beta|alpha|rc)[0-9])?(-dev)?)\';#', $file_contents, $matches);
         if (array_key_exists(2, $matches)) {
+            $version = $matches[2];
 
+            // Matches 8.6.11-dev. This is not actually a valid semantic
+            // version. We fix it to become 8.6.x-dev before returning.
+            if (strstr($version, '-dev') !== FALSE
+              && substr_count($version, '.') == 2) {
+                // Matches (core) version 8.6.11-dev.
+                $version = str_replace('-dev', '', $version);
+                $pos1 = strpos($version, '.');
+                $pos2 = strpos($version, '.', $pos1 + 1);
+                $version = substr($version, 0, $pos1 + $pos2) . 'x-dev';
+            }
 
-
-            return $matches[2];
+            return $version;
         }
     }
 }

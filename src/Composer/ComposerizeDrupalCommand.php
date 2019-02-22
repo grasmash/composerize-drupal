@@ -2,6 +2,7 @@
 
 namespace Grasmash\ComposerConverter\Composer;
 
+use Composer\Semver\Semver;
 use Composer\Util\ProcessExecutor;
 use DrupalFinder\DrupalFinder;
 use Grasmash\ComposerConverter\Utility\ComposerJsonManipulator;
@@ -141,7 +142,13 @@ class ComposerizeDrupalCommand extends BaseCommand
     {
         if (file_exists($this->drupalRoot . "/core/lib/Drupal.php")) {
             $bootstrap =  file_get_contents($this->drupalRoot . "/core/lib/Drupal.php");
-            return DrupalInspector::determineDrupalCoreVersionFromDrupalPhp($bootstrap);
+            $core_version = DrupalInspector::determineDrupalCoreVersionFromDrupalPhp($bootstrap);
+
+            if (!Semver::satisfiedBy([$core_version], "*")) {
+                throw new \Exception("Drupal core version $core_version is invalid.");
+            }
+
+            return $core_version;
         }
         if (!isset($this->drupalCoreVersion)) {
             throw new \Exception("Unable to determine Drupal core version.");

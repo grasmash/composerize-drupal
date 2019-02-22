@@ -76,8 +76,6 @@ class DrupalInspectorTest extends TestBase
             ['1.x-dev', TRUE, '1.x-dev'],
             ['8.6.x-dev', FALSE, '8.6.x-dev'],
             ['8.6.x-dev', TRUE, '8.6.x-dev'],
-            ['8.6.11-dev', FALSE, '8.6.x-dev'],
-            ['8.6.11-dev', TRUE, '8.6.x-dev'],
             ['3.0.0-alpha1', FALSE, '^3.0.0-alpha1'],
             ['3.12.0-beta2', FALSE, '^3.12.0-beta2'],
             ['4.0.0-rc12', FALSE, '^4.0.0-rc12'],
@@ -108,7 +106,7 @@ class DrupalInspectorTest extends TestBase
          ["const VERSION = '8.0.0-rc2';", "8.0.0-rc2"],
          ["const VERSION = '8.5.11';", "8.5.11"],
          ["const VERSION = '8.5.x-dev';", "8.5.x-dev"],
-         ["const VERSION = '8.6.11-dev';", "8.6.11-dev"],
+         ["const VERSION = '8.6.11-dev';", "8.6.x-dev"],
         ];
     }
 }
