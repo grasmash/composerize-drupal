@@ -74,8 +74,41 @@ class DrupalInspectorTest extends TestBase
             ['3.0.0', FALSE, '^3.0.0'],
             ['1.x-dev', FALSE, '1.x-dev'],
             ['1.x-dev', TRUE, '1.x-dev'],
+            ['8.6.x-dev', FALSE, '8.6.x-dev'],
+            ['8.6.x-dev', TRUE, '8.6.x-dev'],
             ['8.6.11-dev', FALSE, '8.6.x-dev'],
             ['8.6.11-dev', TRUE, '8.6.x-dev'],
+            ['3.0.0-alpha1', FALSE, '^3.0.0-alpha1'],
+            ['3.12.0-beta2', FALSE, '^3.12.0-beta2'],
+            ['4.0.0-rc12', FALSE, '^4.0.0-rc12'],
+            ['0.1.0-rc2', FALSE, '^0.1.0-rc2'],
+        ];
+    }
+
+    /**
+     * @dataProvider providerDetermineDrupalCoreVersionFromDrupalPhp
+     */
+    public function testDetermineDrupalCoreVersionFromDrupalPhp($file_contents, $expected_core_version)
+    {
+        $core_version = DrupalInspector::determineDrupalCoreVersionFromDrupalPhp($file_contents);
+        $this->assertEquals($expected_core_version, $core_version);
+    }
+
+    /**
+     * Provides values to determineDrupalCoreVersionFromDrupalPhp().
+     *
+     * @return array
+     *   An array of values to test.
+     */
+    public function providerDetermineDrupalCoreVersionFromDrupalPhp()
+    {
+        return [
+         ["const VERSION = '8.0.0';", "8.0.0"],
+         ["const VERSION = '8.0.0-beta1';", "8.0.0-beta1"],
+         ["const VERSION = '8.0.0-rc2';", "8.0.0-rc2"],
+         ["const VERSION = '8.5.11';", "8.5.11"],
+         ["const VERSION = '8.5.x-dev';", "8.5.x-dev"],
+         ["const VERSION = '8.6.11-dev';", "8.6.11-dev"],
         ];
     }
 }

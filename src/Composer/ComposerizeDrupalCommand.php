@@ -141,19 +141,7 @@ class ComposerizeDrupalCommand extends BaseCommand
     {
         if (file_exists($this->drupalRoot . "/core/lib/Drupal.php")) {
             $bootstrap =  file_get_contents($this->drupalRoot . "/core/lib/Drupal.php");
-            /**
-             * Matches:
-             * const VERSION = '8.0.0';
-             * const VERSION = '8.0.0-beta1';
-             * const VERSION = '8.0.0-rc2';
-             * const VERSION = '8.5.11';
-             * const VERSION = '8.5.x-dev';
-             * const VERSION = '8.6.11-dev';
-             */
-            preg_match('#(const VERSION = \')(\d\.\d\.(\d{1,}|x)(-(beta|alpha|rc)[0-9])?(-dev)?)\';#', $bootstrap, $matches);
-            if (array_key_exists(2, $matches)) {
-                return $matches[2];
-            }
+            return DrupalInspector::determineDrupalCoreVersionFromDrupalPhp($bootstrap);
         }
         if (!isset($this->drupalCoreVersion)) {
             throw new \Exception("Unable to determine Drupal core version.");
