@@ -64,7 +64,7 @@ class SandboxManager
             'git init' .
             ' && git add -A' .
             ' && git commit -m "Initial commit."'
-        );
+        , null, null, null, 60 * 5);
         $process->run();
 
         return $sandbox;

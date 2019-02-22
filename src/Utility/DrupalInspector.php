@@ -87,4 +87,38 @@ class DrupalInspector
 
         return $version;
     }
+
+    /**
+     * @param $version
+     *
+     * @return string
+     */
+    public static function getVersionConstraint($version, $exact_versions)
+    {
+        if ($version == null) {
+            return "*";
+        }
+        elseif (strstr($version, '-dev') !== FALSE) {
+            $num_dots = substr_count($version, '.');
+            // Matches 1.x-dev.
+            if ($num_dots == 1) {
+                return $version;
+            }
+            // Matches (core) version 8.6.11-dev.
+            elseif ($num_dots == 2) {
+                $version = str_replace('-dev', '', $version);
+                $pos1 = strpos($version, '.');
+                $pos2 = strpos($version, '.', $pos1 + 1);
+                $version = substr($version, 0, $pos1 + $pos2) . 'x-dev';
+            }
+
+            return $version;
+        }
+        elseif ($exact_versions) {
+            return $version;
+        }
+        else {
+            return "^" . $version;
+        }
+    }
 }

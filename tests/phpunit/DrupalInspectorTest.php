@@ -25,7 +25,7 @@ class DrupalInspectorTest extends TestBase
     }
 
   /**
-   * @dataProvider getValueProvider
+   * @dataProvider providerGetSemanticVersion
    */
     public function testGetSemanticVersion($drupal_version, $semantic_version)
     {
@@ -39,7 +39,7 @@ class DrupalInspectorTest extends TestBase
    * @return array
    *   An array of values to test.
    */
-    public function getValueProvider()
+    public function providerGetSemanticVersion()
     {
         return [
         ['3.0', '3.0.0'],
@@ -49,6 +49,33 @@ class DrupalInspectorTest extends TestBase
         ['3.12-beta2', '3.12.0-beta2'],
         ['4.0-rc12', '4.0.0-rc12'],
         ['0.1-rc2', '0.1.0-rc2'],
+        ];
+    }
+
+    /**
+     * @dataProvider providerGetVersionConstraint
+     */
+    public function testGetVersionConstraint($semantic_version, $exact_versions, $expected_constraint)
+    {
+        $version_constraint = DrupalInspector::getVersionConstraint($semantic_version, $exact_versions);
+        $this->assertEquals($expected_constraint, $version_constraint);
+    }
+
+    /**
+     * Provides values to testArrayMergeNoDuplicates().
+     *
+     * @return array
+     *   An array of values to test.
+     */
+    public function providerGetVersionConstraint()
+    {
+        return [
+            ['3.0.0', TRUE, '3.0.0'],
+            ['3.0.0', FALSE, '^3.0.0'],
+            ['1.x-dev', FALSE, '1.x-dev'],
+            ['1.x-dev', TRUE, '1.x-dev'],
+            ['8.6.11-dev', FALSE, '8.6.x-dev'],
+            ['8.6.11-dev', TRUE, '8.6.x-dev'],
         ];
     }
 }

@@ -6,7 +6,6 @@ use Composer\Util\ProcessExecutor;
 use DrupalFinder\DrupalFinder;
 use Grasmash\ComposerConverter\Utility\ComposerJsonManipulator;
 use Grasmash\ComposerConverter\Utility\DrupalInspector;
-use function PHPSTORM_META\elementType;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -173,7 +172,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $projects = array_merge($modules, $themes, $profiles);
         foreach ($projects as $project => $version) {
             $package_name = "drupal/$project";
-            $version_constraint = $this->getVersionConstraint($version);
+            $version_constraint = DrupalInspector::getVersionConstraint($version, $this->input->getOption('exact-versions'));
             $root_composer_json->require->{$package_name} = $version_constraint;
 
             if ($version_constraint == "*") {
@@ -253,7 +252,7 @@ class ComposerizeDrupalCommand extends BaseCommand
      */
     protected function requireDrupalCore($root_composer_json)
     {
-        $version_constraint = $this->getVersionConstraint($this->drupalCoreVersion);
+        $version_constraint = DrupalInspector::getVersionConstraint($this->drupalCoreVersion, $this->input->getOption('exact-versions'));
         $root_composer_json->require->{'drupal/core'} = $version_constraint;
         $this->getIO()
             ->write("<info>Added drupal/core $version_constraint to requirements.</info>");
@@ -331,30 +330,6 @@ class ComposerizeDrupalCommand extends BaseCommand
             ->name('/^composer\.(lock|json)$/');
         $files = iterator_to_array($finder);
         $this->fs->remove($files);
-    }
-
-    /**
-     * @param $version
-     *
-     * @return string
-     */
-    protected function getVersionConstraint($version)
-    {
-        if ($version == null) {
-            return "*";
-        } elseif ($this->input->getOption('exact-versions')) {
-            return $version;
-        }
-        elseif (strstr('-dev', $version) !== FALSE) {
-            // If the version is something like 8.6.11-dev, return
-            // ^8.6.11.
-            // @todo Consider changing behavior to return 8.6.x-dev.
-            $version = str_replace('-dev', '', $version);
-            return "^" . $version;
-        }
-        else {
-            return "^" . $version;
-        }
     }
 
     protected function printPostScript()
