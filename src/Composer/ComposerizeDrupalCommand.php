@@ -148,8 +148,9 @@ class ComposerizeDrupalCommand extends BaseCommand
              * const VERSION = '8.0.0-rc2';
              * const VERSION = '8.5.11';
              * const VERSION = '8.5.x-dev';
+             * const VERSION = '8.6.11-dev';
              */
-            preg_match('#(const VERSION = \')(\d\.\d\.((\d{1,}(-(beta|alpha|rc)[0-9])?)|(x-dev)))\';#', $bootstrap, $matches);
+            preg_match('#(const VERSION = \')(\d\.\d\.(\d{1,}|x)(-(beta|alpha|rc)[0-9])?(-dev)?)\';#', $bootstrap, $matches);
             if (array_key_exists(2, $matches)) {
                 return $matches[2];
             }
