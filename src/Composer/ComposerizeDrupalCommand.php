@@ -6,6 +6,7 @@ use Composer\Util\ProcessExecutor;
 use DrupalFinder\DrupalFinder;
 use Grasmash\ComposerConverter\Utility\ComposerJsonManipulator;
 use Grasmash\ComposerConverter\Utility\DrupalInspector;
+use function PHPSTORM_META\elementType;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -343,7 +344,15 @@ class ComposerizeDrupalCommand extends BaseCommand
             return "*";
         } elseif ($this->input->getOption('exact-versions')) {
             return $version;
-        } else {
+        }
+        elseif (strstr('-dev', $version) !== FALSE) {
+            // If the version is something like 8.6.11-dev, return
+            // ^8.6.11.
+            // @todo Consider changing behavior to return 8.6.x-dev.
+            $version = str_replace('-dev', '', $version);
+            return "^" . $version;
+        }
+        else {
             return "^" . $version;
         }
     }
