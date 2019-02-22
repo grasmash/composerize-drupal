@@ -24,17 +24,29 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     // @todo Test --drupal-root option.
 
     /**
+     * Tests various Drupal core versions with command.
+     *
+     * @param string $drupal_core_version
+     *   The Drupal core version. E.g., 8.6.0.
+     *
      * @dataProvider providerTestDrupalCoreVersions
      */
-    public function testDrupalCoreVersions($drupal_core_version)
+    public function testDrupalCoreVersions($drupal_core_version, $success_expected)
     {
         $this->sandboxManager->setDrupalVersion($drupal_core_version);
         $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->sandbox = $this->sandbox . "/docroot";
         $args = [];
         $options = [ 'interactive' => false ];
-        $this->commandTester->execute($args, $options);
-        $this->assertCorrectFileGeneration('');
+        $exit_code = $this->commandTester->execute($args, $options);
+
+        if ($success_expected) {
+            $this->assertEquals(0, $exit_code);
+            $this->assertCorrectFileGeneration('');
+        }
+        else {
+            $this->assertNotEquals(0, $exit_code);
+        }
     }
 
     /**
@@ -46,10 +58,10 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function providerTestDrupalCoreVersions()
     {
         return [
-            ['8.6.0'],
-            ['8.6.x-dev'],
+            ['8.6.0', TRUE],
+            ['8.6.x-dev', TRUE],
             // Invalid version.
-            ['0.0.0'],
+            ['0.0.0', FALSE],
         ];
     }
 
