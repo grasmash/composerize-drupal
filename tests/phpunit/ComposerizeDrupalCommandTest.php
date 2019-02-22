@@ -25,6 +25,36 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     // @todo Test --drupal-root option.
 
     /**
+     * @dataProvider providerTestDrupalCoreVersions
+     */
+    public function testDrupalCoreVersions($drupal_core_version)
+    {
+        $this->sandboxManager->setDrupalVersion($drupal_core_version);
+        $this->sandbox = $this->sandboxManager->makeSandbox();
+        $this->sandbox = $this->sandbox . "/docroot";
+        $args = [];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+        $this->assertCorrectFileGeneration('');
+    }
+
+    /**
+     * Provides values to testDrupalCoreVersions().
+     *
+     * @return array
+     *   An array of values to test.
+     */
+    public function providerTestDrupalCoreVersions()
+    {
+        return [
+            ['8.6.0'],
+            ['8.6.x-dev'],
+            // Invalid version.
+            ['0.0.0'],
+        ];
+    }
+
+    /**
      * Tests that composer.json contents are valid.
      *
      * This test will assume composer root is docroot, a default subdir that
@@ -133,7 +163,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
             $composer_json->require
         );
         $this->assertEquals(
-            "^" . $this->drupalVersion,
+            "^" . $this->sandboxManager->getDrupalVersion(),
             $composer_json->require->{'drupal/core'}
         );
 

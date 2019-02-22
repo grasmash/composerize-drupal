@@ -141,7 +141,15 @@ class ComposerizeDrupalCommand extends BaseCommand
     {
         if (file_exists($this->drupalRoot . "/core/lib/Drupal.php")) {
             $bootstrap =  file_get_contents($this->drupalRoot . "/core/lib/Drupal.php");
-            preg_match('|(const VERSION = \')(\d\.\d\.\d)\';|', $bootstrap, $matches);
+            /**
+             * Matches:
+             * const VERSION = '8.0.0';
+             * const VERSION = '8.0.0-beta1';
+             * const VERSION = '8.0.0-rc2';
+             * const VERSION = '8.5.11';
+             * const VERSION = '8.5.x-dev';
+             */
+            preg_match('|(const VERSION = \')(\d\.\d\.((\d{1,}(-(beta|alpha|rc)[0-9])?)|(x-dev)))\';|', $bootstrap, $matches);
             if (array_key_exists(2, $matches)) {
                 return $matches[2];
             }

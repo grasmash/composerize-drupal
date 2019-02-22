@@ -12,19 +12,32 @@ class SandboxManager
 {
     protected $tmp;
 
-    protected $drupalVersion;
+    protected $drupalVersion = "8.6.0";
 
-  /** @var string */
+    /**
+     * @param mixed $drupalVersion
+     */
+    public function setDrupalVersion($drupalVersion) {
+        $this->drupalVersion = $drupalVersion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDrupalVersion() {
+        return $this->drupalVersion;
+    }
+
+    /** @var string */
     protected $composerizeDrupalPath;
 
-  /** @var Filesystem */
+    /** @var Filesystem */
     protected $fs;
 
-    public function __construct($drupal_version)
+    public function __construct()
     {
         $this->fs = new Filesystem();
         $this->composerizeDrupalPath = dirname(dirname(dirname(__DIR__)));
-        $this->drupalVersion = $drupal_version;
     }
 
   /**
