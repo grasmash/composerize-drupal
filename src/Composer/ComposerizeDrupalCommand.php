@@ -204,7 +204,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $output_callback = function ($type, $buffer) use ($io) {
             $io->write($buffer, false);
         };
-        return $executor->execute('composer update', $output_callback, $this->baseDir);
+        return $executor->execute('composer update --no-interaction', $output_callback, $this->baseDir);
     }
 
     /**
