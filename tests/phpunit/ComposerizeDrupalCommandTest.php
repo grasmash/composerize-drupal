@@ -16,7 +16,6 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function setUp()
     {
         parent::setUp();
-        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->application->add(new TestableComposerizeDrupalCommand());
         $this->command = $this->application->find('composerize-drupal');
         $this->commandTester = new CommandTester($this->command);
@@ -62,6 +61,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testNoSubdirAssumed()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->sandbox = $this->sandbox . "/docroot";
         $args = [];
         $options = [ 'interactive' => false ];
@@ -75,6 +75,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testNoSubDirExplicit()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->sandbox = $this->sandbox . "/docroot";
         $args = [
             '--composer-root' => 'docroot',
@@ -91,6 +92,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testSubdirAssumed()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $args = [
             '--composer-root' => '.',
             '--no-update' => true,
@@ -106,6 +108,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testSubDirExplicit()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->fs->rename($this->sandbox . "/docroot", $this->sandbox . "/drupal8");
         $args = [
             '--composer-root' => '.',
@@ -123,6 +126,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testDrupalEndpoint()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $args = [
             '--composer-root' => '.',
             '--no-update' => true,
