@@ -53,9 +53,11 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function providerTestDrupalCoreVersions()
     {
         return [
-            ['8.6.x-dev'],
-            ['8.6.0'],
-            ['8.6.0-rc1'],
+            // Currently dev versions of core do not work due to
+            // the coder module making vendor file changes that prompt Composer
+            // to ask interactive questions.
+            // ['8.6.x-dev'],
+            ['8.6.10'],
         ];
     }
 
