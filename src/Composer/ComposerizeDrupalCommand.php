@@ -2,6 +2,7 @@
 
 namespace Grasmash\ComposerConverter\Composer;
 
+use Composer\Semver\Semver;
 use Composer\Util\ProcessExecutor;
 use DrupalFinder\DrupalFinder;
 use Grasmash\ComposerConverter\Utility\ComposerJsonManipulator;
@@ -141,10 +142,13 @@ class ComposerizeDrupalCommand extends BaseCommand
     {
         if (file_exists($this->drupalRoot . "/core/lib/Drupal.php")) {
             $bootstrap =  file_get_contents($this->drupalRoot . "/core/lib/Drupal.php");
-            preg_match('|(const VERSION = \')(\d\.\d\.\d)\';|', $bootstrap, $matches);
-            if (array_key_exists(2, $matches)) {
-                return $matches[2];
+            $core_version = DrupalInspector::determineDrupalCoreVersionFromDrupalPhp($bootstrap);
+
+            if (!Semver::satisfiedBy([$core_version], "*")) {
+                throw new \Exception("Drupal core version $core_version is invalid.");
             }
+
+            return $core_version;
         }
         if (!isset($this->drupalCoreVersion)) {
             throw new \Exception("Unable to determine Drupal core version.");
@@ -163,7 +167,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $projects = array_merge($modules, $themes, $profiles);
         foreach ($projects as $project => $version) {
             $package_name = "drupal/$project";
-            $version_constraint = $this->getVersionConstraint($version);
+            $version_constraint = DrupalInspector::getVersionConstraint($version, $this->input->getOption('exact-versions'));
             $root_composer_json->require->{$package_name} = $version_constraint;
 
             if ($version_constraint == "*") {
@@ -200,7 +204,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $output_callback = function ($type, $buffer) use ($io) {
             $io->write($buffer, false);
         };
-        return $executor->execute('composer update', $output_callback, $this->baseDir);
+        return $executor->execute('composer update --no-interaction', $output_callback, $this->baseDir);
     }
 
     /**
@@ -243,7 +247,7 @@ class ComposerizeDrupalCommand extends BaseCommand
      */
     protected function requireDrupalCore($root_composer_json)
     {
-        $version_constraint = $this->getVersionConstraint($this->drupalCoreVersion);
+        $version_constraint = DrupalInspector::getVersionConstraint($this->drupalCoreVersion, $this->input->getOption('exact-versions'));
         $root_composer_json->require->{'drupal/core'} = $version_constraint;
         $this->getIO()
             ->write("<info>Added drupal/core $version_constraint to requirements.</info>");
@@ -321,22 +325,6 @@ class ComposerizeDrupalCommand extends BaseCommand
             ->name('/^composer\.(lock|json)$/');
         $files = iterator_to_array($finder);
         $this->fs->remove($files);
-    }
-
-    /**
-     * @param $version
-     *
-     * @return string
-     */
-    protected function getVersionConstraint($version)
-    {
-        if ($version == null) {
-            return "*";
-        } elseif ($this->input->getOption('exact-versions')) {
-            return $version;
-        } else {
-            return "^" . $version;
-        }
     }
 
     protected function printPostScript()

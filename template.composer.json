@@ -30,7 +30,8 @@
   },
   "require-dev": {},
   "config": {
-    "sort-packages": true
+    "sort-packages": true,
+    "discard-changes": true
   },
   "conflict": {
     "drupal/drupal": "*"

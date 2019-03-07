@@ -9,13 +9,19 @@ use Webmozart\PathUtil\Path;
 
 abstract class CommandTestBase extends TestBase
 {
-    /** @var \Grasmash\ComposerConverter\Tests\Application */
+    /**
+     * @var \Grasmash\ComposerConverter\Tests\Application
+     */
     protected $application;
 
-    /** @var \Grasmash\ComposerConverter\Tests\TestableComposerizeDrupalCommand $command */
+    /**
+     * @var \Grasmash\ComposerConverter\Tests\TestableComposerizeDrupalCommand $command
+     */
     protected $command;
 
-    /** @var CommandTester */
+    /**
+     * @var CommandTester
+     */
     protected $commandTester;
 
     /**

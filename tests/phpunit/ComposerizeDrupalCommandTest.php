@@ -16,13 +16,50 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function setUp()
     {
         parent::setUp();
-        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->application->add(new TestableComposerizeDrupalCommand());
         $this->command = $this->application->find('composerize-drupal');
         $this->commandTester = new CommandTester($this->command);
     }
 
     // @todo Test --drupal-root option.
+
+    /**
+     * Tests various Drupal core versions with command.
+     *
+     * @param string $drupal_core_version
+     *   The Drupal core version. E.g., 8.6.0, 8.6.x-dev.
+     *
+     * @dataProvider providerTestDrupalCoreVersions
+     */
+    public function testDrupalCoreVersions($drupal_core_version)
+    {
+        $this->sandboxManager->setDrupalVersion($drupal_core_version);
+        $this->sandbox = $this->sandboxManager->makeSandbox();
+        $this->sandbox = $this->sandbox . "/docroot";
+        $args = [];
+        $options = [ 'interactive' => false ];
+        $exit_code = $this->commandTester->execute($args, $options);
+
+        $this->assertEquals(0, $exit_code);
+        $this->assertCorrectFileGeneration('');
+    }
+
+    /**
+     * Provides values to testDrupalCoreVersions().
+     *
+     * @return array
+     *   An array of values to test.
+     */
+    public function providerTestDrupalCoreVersions()
+    {
+        return [
+            // Currently dev versions of core do not work due to
+            // the coder module making vendor file changes that prompt Composer
+            // to ask interactive questions.
+            // ['8.6.x-dev'],
+            ['8.6.10'],
+        ];
+    }
 
     /**
      * Tests that composer.json contents are valid.
@@ -32,6 +69,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testNoSubdirAssumed()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->sandbox = $this->sandbox . "/docroot";
         $args = [];
         $options = [ 'interactive' => false ];
@@ -45,6 +83,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testNoSubDirExplicit()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->sandbox = $this->sandbox . "/docroot";
         $args = [
             '--composer-root' => 'docroot',
@@ -61,6 +100,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testSubdirAssumed()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $args = [
             '--composer-root' => '.',
             '--no-update' => true,
@@ -76,6 +116,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testSubDirExplicit()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $this->fs->rename($this->sandbox . "/docroot", $this->sandbox . "/drupal8");
         $args = [
             '--composer-root' => '.',
@@ -93,6 +134,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
      */
     public function testDrupalEndpoint()
     {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
         $args = [
             '--composer-root' => '.',
             '--no-update' => true,
@@ -133,7 +175,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
             $composer_json->require
         );
         $this->assertEquals(
-            "^" . $this->drupalVersion,
+            "^" . $this->sandboxManager->getDrupalVersion(),
             $composer_json->require->{'drupal/core'}
         );
 

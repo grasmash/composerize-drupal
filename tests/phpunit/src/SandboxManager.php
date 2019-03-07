@@ -12,28 +12,47 @@ class SandboxManager
 {
     protected $tmp;
 
-    protected $drupalVersion;
+    protected $drupalVersion = "8.6.0";
 
-  /** @var string */
+    /**
+     * @param mixed $drupalVersion
+     */
+    public function setDrupalVersion($drupalVersion)
+    {
+        $this->drupalVersion = $drupalVersion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDrupalVersion()
+    {
+        return $this->drupalVersion;
+    }
+
+    /**
+     * @var string
+     */
     protected $composerizeDrupalPath;
 
-  /** @var Filesystem */
+    /**
+     * @var Filesystem
+     */
     protected $fs;
 
-    public function __construct($drupal_version)
+    public function __construct()
     {
         $this->fs = new Filesystem();
         $this->composerizeDrupalPath = dirname(dirname(dirname(__DIR__)));
-        $this->drupalVersion = $drupal_version;
     }
 
-  /**
-   * Destroy and re-create sandbox directory for testing.
-   *
-   * Sandbox is a mirror of tests/fixtures/sandbox, located in a temp dir.
-   *
-   * @return bool|string
-   */
+    /**
+     * Destroy and re-create sandbox directory for testing.
+     *
+     * Sandbox is a mirror of tests/fixtures/sandbox, located in a temp dir.
+     *
+     * @return bool|string
+     */
     public function makeSandbox()
     {
         $this->tmp = getenv('COMPOSERIZE_DRUPAL_TMP') ?: sys_get_temp_dir();
@@ -50,7 +69,11 @@ class SandboxManager
         $process = new Process(
             'git init' .
             ' && git add -A' .
-            ' && git commit -m "Initial commit."'
+            ' && git commit -m "Initial commit."',
+            null,
+            null,
+            null,
+            60 * 5
         );
         $process->run();
 

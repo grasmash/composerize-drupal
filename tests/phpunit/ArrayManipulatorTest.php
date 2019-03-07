@@ -20,10 +20,13 @@ class ArrayManipulatorTest extends \PHPUnit_Framework_TestCase
         $array2,
         $expected_array
     ) {
-        $this->assertEquals(ArrayManipulator::arrayMergeRecursiveDistinct(
-            $array1,
-            $array2
-        ), $expected_array);
+        $this->assertEquals(
+            ArrayManipulator::arrayMergeRecursiveDistinct(
+                $array1,
+                $array2
+            ),
+            $expected_array
+        );
     }
 
     /**
