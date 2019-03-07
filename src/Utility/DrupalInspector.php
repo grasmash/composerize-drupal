@@ -98,14 +98,11 @@ class DrupalInspector
     {
         if ($version == null) {
             return "*";
-        }
-        elseif (strstr($version, '-dev') !== FALSE) {
+        } elseif (strstr($version, '-dev') !== false) {
             return $version;
-        }
-        elseif ($exact_versions) {
+        } elseif ($exact_versions) {
             return $version;
-        }
-        else {
+        } else {
             return "^" . $version;
         }
     }
@@ -132,7 +129,7 @@ class DrupalInspector
 
             // Matches 8.6.11-dev. This is not actually a valid semantic
             // version. We fix it to become 8.6.x-dev before returning.
-            if (strstr($version, '-dev') !== FALSE
+            if (strstr($version, '-dev') !== false
               && substr_count($version, '.') == 2) {
                 // Matches (core) version 8.6.11-dev.
                 $version = str_replace('-dev', '', $version);

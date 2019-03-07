@@ -10,23 +10,31 @@ use Webmozart\PathUtil\Path;
 abstract class TestBase extends \PHPUnit_Framework_TestCase
 {
 
-  /** @var Filesystem */
+    /**
+     * @var Filesystem
+     */
     protected $fs;
 
-  /** @var string */
+    /**
+     * @var string
+     */
     protected $composerizeDrupalPath;
 
-  /** @var string */
+    /**
+     * @var string
+     */
     protected $sandbox;
 
-  /** @var \Grasmash\ComposerConverter\Tests\SandboxManager */
+    /**
+     * @var \Grasmash\ComposerConverter\Tests\SandboxManager
+     */
     protected $sandboxManager;
 
-  /**
-   * {@inheritdoc}
-   *
-   * @see https://symfony.com/doc/current/console.html#testing-commands
-   */
+    /**
+     * {@inheritdoc}
+     *
+     * @see https://symfony.com/doc/current/console.html#testing-commands
+     */
     public function setUp()
     {
         parent::setUp();

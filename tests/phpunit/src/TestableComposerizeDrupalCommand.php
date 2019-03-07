@@ -28,7 +28,9 @@ class TestableComposerizeDrupalCommand extends ComposerizeDrupalCommand
         parent::initialize($input, $output);
         $helperSet = new HelperSet([ new QuestionHelper() ]);
 
-        /** @var \Grasmash\ComposerConverter\Tests\Application $application */
+        /**
+         * @var \Grasmash\ComposerConverter\Tests\Application $application
+         */
         $application = $this->getApplication();
         $application->setIo(new ConsoleIO($input, $output, $helperSet));
     }

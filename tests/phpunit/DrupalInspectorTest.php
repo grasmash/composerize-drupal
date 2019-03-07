@@ -12,9 +12,9 @@ use Symfony\Component\Process\Process;
 class DrupalInspectorTest extends TestBase
 {
 
-  /**
-   * Tests DrupalInspector::findContribProjects().
-   */
+    /**
+     * Tests DrupalInspector::findContribProjects().
+     */
     public function testFindModules()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
@@ -24,21 +24,21 @@ class DrupalInspectorTest extends TestBase
         $this->assertContains('3.0.0', $modules);
     }
 
-  /**
-   * @dataProvider providerGetSemanticVersion
-   */
+    /**
+     * @dataProvider providerGetSemanticVersion
+     */
     public function testGetSemanticVersion($drupal_version, $semantic_version)
     {
         $converted_version = DrupalInspector::getSemanticVersion($drupal_version);
         $this->assertEquals($semantic_version, $converted_version);
     }
 
-  /**
-   * Provides values to testArrayMergeNoDuplicates().
-   *
-   * @return array
-   *   An array of values to test.
-   */
+    /**
+     * Provides values to testArrayMergeNoDuplicates().
+     *
+     * @return array
+     *   An array of values to test.
+     */
     public function providerGetSemanticVersion()
     {
         return [
@@ -70,16 +70,16 @@ class DrupalInspectorTest extends TestBase
     public function providerGetVersionConstraint()
     {
         return [
-            ['3.0.0', TRUE, '3.0.0'],
-            ['3.0.0', FALSE, '^3.0.0'],
-            ['1.x-dev', FALSE, '1.x-dev'],
-            ['1.x-dev', TRUE, '1.x-dev'],
-            ['8.6.x-dev', FALSE, '8.6.x-dev'],
-            ['8.6.x-dev', TRUE, '8.6.x-dev'],
-            ['3.0.0-alpha1', FALSE, '^3.0.0-alpha1'],
-            ['3.12.0-beta2', FALSE, '^3.12.0-beta2'],
-            ['4.0.0-rc12', FALSE, '^4.0.0-rc12'],
-            ['0.1.0-rc2', FALSE, '^0.1.0-rc2'],
+            ['3.0.0', true, '3.0.0'],
+            ['3.0.0', false, '^3.0.0'],
+            ['1.x-dev', false, '1.x-dev'],
+            ['1.x-dev', true, '1.x-dev'],
+            ['8.6.x-dev', false, '8.6.x-dev'],
+            ['8.6.x-dev', true, '8.6.x-dev'],
+            ['3.0.0-alpha1', false, '^3.0.0-alpha1'],
+            ['3.12.0-beta2', false, '^3.12.0-beta2'],
+            ['4.0.0-rc12', false, '^4.0.0-rc12'],
+            ['0.1.0-rc2', false, '^0.1.0-rc2'],
         ];
     }
 
