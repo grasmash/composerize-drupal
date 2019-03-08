@@ -39,10 +39,12 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation.');
     }
 
-  /**
-   * @param \Symfony\Component\Console\Input\InputInterface $input
-   * @param \Symfony\Component\Console\Output\OutputInterface $output
-   */
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return int
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
@@ -125,8 +127,11 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected function addRequirementsToComposerJson()
     {
         $root_composer_json = $this->loadRootComposerJson();
-        $this->requireContribProjects($root_composer_json);
+        $projects = $this->findContribProjects($root_composer_json);
+        $this->requireContribProjects($root_composer_json, $projects);
         $this->requireDrupalCore($root_composer_json);
+        $this->addPatches($projects, $root_composer_json);
+
         ComposerJsonManipulator::writeObjectToJsonFile(
             $root_composer_json,
             $this->rootComposerJsonPath
@@ -158,22 +163,17 @@ class ComposerizeDrupalCommand extends BaseCommand
     /**
      * @param $root_composer_json
      */
-    protected function requireContribProjects($root_composer_json)
+    protected function requireContribProjects($root_composer_json, $projects)
     {
-        $modules = DrupalInspector::findContribProjects($this->drupalRoot, "modules/contrib", $root_composer_json);
-        $themes = DrupalInspector::findContribProjects($this->drupalRoot, "themes/contrib", $root_composer_json);
-        $profiles = DrupalInspector::findContribProjects($this->drupalRoot, "profiles/contrib", $root_composer_json);
-
-        $projects = array_merge($modules, $themes, $profiles);
-        foreach ($projects as $project => $version) {
-            $package_name = "drupal/$project";
-            $version_constraint = DrupalInspector::getVersionConstraint($version, $this->input->getOption('exact-versions'));
+        foreach ($projects as $project_name => $project) {
+            $package_name = "drupal/$project_name";
+            $version_constraint = DrupalInspector::getVersionConstraint($project['version'], $this->input->getOption('exact-versions'));
             $root_composer_json->require->{$package_name} = $version_constraint;
 
             if ($version_constraint == "*") {
                 $this->getIO()->write("<comment>Could not determine correct version for project $package_name. Added to requirements without constraint.</comment>");
             } else {
-                $this->getIO()->write("<info>Added $package_name version $version_constraint to requirements.</info>");
+                $this->getIO()->write("<info>Added $package_name with constraint $version_constraint to requirements.</info>");
             }
         }
     }
@@ -335,5 +335,43 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->getIO()->write("");
         $this->getIO()->write("These additional resources may also be helpful:");
         $this->getIO()->write("  * <comment>https://www.lullabot.com/articles/drupal-8-composer-best-practices</comment>");
+    }
+
+    /**
+     * @param $root_composer_json
+     *
+     * @return array
+     */
+    protected function findContribProjects($root_composer_json) {
+        $modules = DrupalInspector::findContribProjects($this->drupalRoot,
+            "modules/contrib", $root_composer_json);
+        $themes = DrupalInspector::findContribProjects($this->drupalRoot,
+            "themes/contrib", $root_composer_json);
+        $profiles = DrupalInspector::findContribProjects($this->drupalRoot,
+            "profiles/contrib", $root_composer_json);
+        $projects = array_merge($modules, $themes, $profiles);
+        return $projects;
+    }
+
+    /**
+     * @param $projects
+     * @param $root_composer_json
+     */
+    protected function addPatches($projects, $root_composer_json) {
+        $projects = DrupalInspector::findProjectPatches($projects);
+        $patch_dir = $this->getBaseDir() . "/patches";
+        $this->fs->mkdir($patch_dir);
+        foreach ($projects as $project_name => $project) {
+            if (array_key_exists('patches', $project)) {
+                foreach ($project['patches'] as $key => $patch) {
+                    $target_filename = $patch_dir . "/" . basename($patch);
+                    $this->fs->copy($patch, $target_filename);
+                    $relative_path = $this->fs->makePathRelative($target_filename,
+                        $this->getBaseDir());
+                    $relative_path = rtrim($relative_path, '/');
+                    $root_composer_json->extra->patches["drupal/" . $project_name][$relative_path] = $relative_path;
+                }
+            }
+        }
     }
 }

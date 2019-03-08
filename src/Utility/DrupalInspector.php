@@ -9,6 +9,13 @@ use Symfony\Component\Yaml\Yaml;
 class DrupalInspector
 {
 
+    /**
+     * @param $drupal_root
+     * @param $subdir
+     * @param $composer_json
+     *
+     * @return array
+     */
     public static function findContribProjects($drupal_root, $subdir, $composer_json)
     {
         if (!file_exists($drupal_root . "/" . $subdir)) {
@@ -43,7 +50,34 @@ class DrupalInspector
             if ($semantic_version === false) {
                 $semantic_version = null;
             }
-            $projects[$machine_name] = $semantic_version;
+            $projects[$machine_name]["version"] = $semantic_version;
+            $projects[$machine_name]["dir"] = dirname($path);
+        }
+
+        return $projects;
+
+    }
+
+    /**
+     * Finds all *.patch files contrib projects listed in $projects.
+     *
+     * @param array $projects
+     *   An array of contrib projects returned by self::findContribProjects().
+     *
+     * @return array
+     */
+    public static function findProjectPatches($projects) {
+        foreach ($projects as $project_name => $project) {
+            $finder = new Finder();
+            $finder->in([$project['dir']])
+                ->name('*.patch')
+                ->files();
+
+            foreach ($finder as $fileInfo) {
+                $pathname = $fileInfo->getPathname();
+                $projects[$project_name]['patches'][] = $pathname;
+            }
+
         }
 
         return $projects;
@@ -108,9 +142,12 @@ class DrupalInspector
     }
 
     /**
-     * @param $matches
+     * Determines the version of Drupal core by looking at Drupal.php contents.
      *
-     * @throws \Exception
+     * @param string $file_contents
+     *   The contents of Drupal.php.
+     *
+     * @return mixed|string
      */
     public static function determineDrupalCoreVersionFromDrupalPhp($file_contents)
     {

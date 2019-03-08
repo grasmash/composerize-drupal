@@ -64,6 +64,8 @@ class SandboxManager
         $this->fs->mirror($sandbox_master, $sandbox);
         $this->dowloadAndCopyDrupalCore($this->drupalVersion, $this->tmp, $sandbox);
         $this->downloadAndCopyCtools($this->tmp, $sandbox);
+        // Create fake patch for ctools.
+        $this->fs->touch($sandbox . "/docroot/modules/contrib/ctools/test.patch");
 
         chdir($sandbox);
         $process = new Process(
