@@ -21,7 +21,9 @@ class DrupalInspectorTest extends TestBase
         $composer_json = json_decode(file_get_contents($this->sandbox . "/docroot/composer.json"));
         $modules = DrupalInspector::findContribProjects($this->sandbox . "/docroot", "modules/contrib", $composer_json);
         $this->assertArrayHasKey('ctools', $modules);
-        $this->assertContains('3.0.0', $modules);
+        $this->assertArrayHasKey('version', $modules['ctools']);
+        $this->assertArrayHasKey('dir', $modules['ctools']);
+        $this->assertContains('3.0.0', $modules['ctools']['version']);
     }
 
     /**

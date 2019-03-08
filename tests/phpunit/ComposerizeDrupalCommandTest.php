@@ -191,6 +191,14 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $this->assertObjectHasAttribute($relative_drupal_root . 'themes/custom/{$name}', $composer_json->extra->{'installer-paths'});
         $this->assertObjectHasAttribute($relative_drupal_root . 'libraries/{$name}', $composer_json->extra->{'installer-paths'});
 
+        // Assert patches.
+        $this->assertObjectHasAttribute('patches', $composer_json->extra);
+        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->extra->patches);
+        $patch_relative_path = "patches/test.patch";
+        $this->assertObjectHasAttribute('drupal/ctools', $composer_json->extra->patches);
+        $this->assertObjectHasAttribute($patch_relative_path, $composer_json->extra->patches->{"drupal/ctools"});
+        $this->assertEquals($patch_relative_path, $composer_json->extra->patches->{"drupal/ctools"}->{$patch_relative_path});
+
         // Assert merge-plugin.
         $this->assertContains($relative_drupal_root . "modules/custom/*/composer.json", $composer_json->extra->{'merge-plugin'}->include);
     }
