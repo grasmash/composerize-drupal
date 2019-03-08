@@ -55,7 +55,6 @@ class DrupalInspector
         }
 
         return $projects;
-
     }
 
     /**
@@ -66,7 +65,8 @@ class DrupalInspector
      *
      * @return array
      */
-    public static function findProjectPatches($projects) {
+    public static function findProjectPatches($projects)
+    {
         foreach ($projects as $project_name => $project) {
             $finder = new Finder();
             $finder->in([$project['dir']])
@@ -77,7 +77,6 @@ class DrupalInspector
                 $pathname = $fileInfo->getPathname();
                 $projects[$project_name]['patches'][] = $pathname;
             }
-
         }
 
         return $projects;

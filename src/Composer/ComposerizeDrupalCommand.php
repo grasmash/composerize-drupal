@@ -342,13 +342,23 @@ class ComposerizeDrupalCommand extends BaseCommand
      *
      * @return array
      */
-    protected function findContribProjects($root_composer_json) {
-        $modules = DrupalInspector::findContribProjects($this->drupalRoot,
-            "modules/contrib", $root_composer_json);
-        $themes = DrupalInspector::findContribProjects($this->drupalRoot,
-            "themes/contrib", $root_composer_json);
-        $profiles = DrupalInspector::findContribProjects($this->drupalRoot,
-            "profiles/contrib", $root_composer_json);
+    protected function findContribProjects($root_composer_json)
+    {
+        $modules = DrupalInspector::findContribProjects(
+            $this->drupalRoot,
+            "modules/contrib",
+            $root_composer_json
+        );
+        $themes = DrupalInspector::findContribProjects(
+            $this->drupalRoot,
+            "themes/contrib",
+            $root_composer_json
+        );
+        $profiles = DrupalInspector::findContribProjects(
+            $this->drupalRoot,
+            "profiles/contrib",
+            $root_composer_json
+        );
         $projects = array_merge($modules, $themes, $profiles);
         return $projects;
     }
@@ -357,7 +367,8 @@ class ComposerizeDrupalCommand extends BaseCommand
      * @param $projects
      * @param $root_composer_json
      */
-    protected function addPatches($projects, $root_composer_json) {
+    protected function addPatches($projects, $root_composer_json)
+    {
         $projects = DrupalInspector::findProjectPatches($projects);
         $patch_dir = $this->getBaseDir() . "/patches";
         $this->fs->mkdir($patch_dir);
@@ -366,8 +377,10 @@ class ComposerizeDrupalCommand extends BaseCommand
                 foreach ($project['patches'] as $key => $patch) {
                     $target_filename = $patch_dir . "/" . basename($patch);
                     $this->fs->copy($patch, $target_filename);
-                    $relative_path = $this->fs->makePathRelative($target_filename,
-                        $this->getBaseDir());
+                    $relative_path = $this->fs->makePathRelative(
+                        $target_filename,
+                        $this->getBaseDir()
+                    );
                     $relative_path = rtrim($relative_path, '/');
                     $root_composer_json->extra->patches["drupal/" . $project_name][$relative_path] = $relative_path;
                 }
