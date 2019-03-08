@@ -139,8 +139,7 @@ class ComposerizeDrupalCommand extends BaseCommand
     }
 
     /**
-     * @param $matches
-     *
+     * @return mixed|string
      * @throws \Exception
      */
     protected function determineDrupalCoreVersion()
@@ -162,6 +161,7 @@ class ComposerizeDrupalCommand extends BaseCommand
 
     /**
      * @param $root_composer_json
+     * @param $projects
      */
     protected function requireContribProjects($root_composer_json, $projects)
     {
