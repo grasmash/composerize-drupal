@@ -48,10 +48,13 @@ The `[drupal-root]` should be the Drupal root, where `index.php` is located.
 Examples:
 ```
 # Drupal is located in a `docroot` subdirectory.
-composer composerize-drupal --composer-root=. --drupal-root=docroot
+composer composerize-drupal --composer-root=. --drupal-root=./docroot
 
 # Drupal is located in a `web` subdirectory.
-composer composerize-drupal --composer-root=. --drupal-root=web
+composer composerize-drupal --composer-root=. --drupal-root=./web
+
+# Drupal is located in a `public_html` subdirectory (cPanel compatible).
+composer composerize-drupal --composer-root=. --drupal-root=./public_html
 
 # Drupal is located in the repository root, not in a subdirectory.
 composer composerize-drupal --composer-root=. --drupal-root=.
