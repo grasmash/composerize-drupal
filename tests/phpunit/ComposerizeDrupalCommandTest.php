@@ -131,16 +131,17 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
 
     public function testFindContribDirs() {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $this->fs->mirror($this->sandbox . '/modules/contrib/ctools', $this->sandbox . '/profiles/example');
+        $this->fs->mirror($this->sandbox . '/modules/contrib/ctools', $this->sandbox . '/modules/ctools');
+        $this->fs->remove($this->sandbox . '/modules/contrib/ctools');
         $args = [
             '--composer-root' => '.',
-            '--drupal-root' => '.',
             '--no-update' => true,
+            '--contrib-dir=modules',
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-        $this->assertCorrectFileGeneration('drupal8/');
-        $this->assertFileNotExists($this->sandbox . "/drupal8/composer.json");
+        $this->assertCorrectFileGeneration('docroot/');
+        $this->assertFileNotExists($this->sandbox . "/docroot/composer.json");
     }
 
     /**
