@@ -149,6 +149,25 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     }
 
     /**
+     * Test command whe --no-gitignore option is passed.
+     */
+    public function testGitignore()
+    {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
+        $original_gitignore = file_get_contents($this->sandbox . '/.gitignore');
+        $args = [
+            '--composer-root' => '.',
+            '--drupal-root' => '.',
+            '--no-update' => true,
+            '--no-gitignore' => false,
+        ];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+        $this->assertCorrectFileGeneration('');
+        $this->assertNotEquals($original_gitignore, file_get_contents($this->sandbox . '/.gitignore'));
+    }
+
+    /**
      * Tests modules can be downloaded from Drupal.org.
      */
     public function testDrupalEndpoint()
