@@ -135,7 +135,8 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function testNoGitignore()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $original_gitignore = file_get_contents($this->sandbox . '/.gitignore');
+        $original_gitignore = 'vendor';
+        file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
         $args = [
             '--composer-root' => '.',
             '--drupal-root' => '.',
@@ -154,7 +155,8 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function testGitignore()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $original_gitignore = file_get_contents($this->sandbox . '/.gitignore');
+        $original_gitignore = 'vendor';
+        file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
         $args = [
             '--composer-root' => '.',
             '--drupal-root' => '.',
