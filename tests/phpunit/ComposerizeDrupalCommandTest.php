@@ -130,6 +130,46 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     }
 
     /**
+     * Test command with --no-gitignore option is passed.
+     */
+    public function testNoGitignore()
+    {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
+        $original_gitignore = 'vendor';
+        file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
+        $args = [
+            '--composer-root' => '.',
+            '--no-update' => true,
+            '--no-gitignore' => true,
+        ];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+        $this->assertCorrectFileGeneration('docroot/');
+        $this->assertFileNotExists($this->sandbox . "/docroot/composer.json");
+        $this->assertEquals($original_gitignore, file_get_contents($this->sandbox . '/.gitignore'));
+    }
+
+    /**
+     * Test command without --no-gitignore option is passed.
+     */
+    public function testGitignore()
+    {
+        $this->sandbox = $this->sandboxManager->makeSandbox();
+        $original_gitignore = 'vendor';
+        file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
+        $args = [
+            '--composer-root' => '.',
+            '--no-update' => true,
+            '--no-gitignore' => false,
+        ];
+        $options = [ 'interactive' => false ];
+        $this->commandTester->execute($args, $options);
+        $this->assertCorrectFileGeneration('docroot/');
+        $this->assertFileNotExists($this->sandbox . "/docroot/composer.json");
+        $this->assertNotEquals($original_gitignore, file_get_contents($this->sandbox . '/.gitignore'));
+    }
+
+    /**
      * Tests modules can be downloaded from Drupal.org.
      */
     public function testDrupalEndpoint()
