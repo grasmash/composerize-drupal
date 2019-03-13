@@ -37,10 +37,11 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->addOption('drupal-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the Drupal root directory.');
         $this->addOption('exact-versions', null, InputOption::VALUE_NONE, 'Use exact version constraints rather than the recommended caret operator.');
         $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation.');
+        $this->addOption('no-gitignore', null, InputOption::VALUE_NONE, 'Prevent root .gitignore file from being modified.');
         $this->addUsage('--composer-root=. --drupal-root=./docroot');
         $this->addUsage('--composer-root=. --drupal-root=./web');
         $this->addUsage('--composer-root=. --drupal-root=.');
-        $this->addUsage('--exact-versions --no-update');
+        $this->addUsage('--exact-versions --no-update --no-gitignore');
     }
 
     /**
@@ -58,7 +59,9 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->removeAllComposerFiles();
         $this->createNewComposerJson();
         $this->addRequirementsToComposerJson();
-        $this->mergeTemplateGitignore();
+        if (!$this->input->getOption('no-gitignore')) {
+            $this->mergeTemplateGitignore();
+        }
 
         $exit_code = 0;
         if (!$input->getOption('no-update')) {
