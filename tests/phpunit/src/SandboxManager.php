@@ -88,7 +88,7 @@ class SandboxManager
         $targz_filepath = "{$this->tmp}/$targz_filename";
         $tar_filepath = str_replace('.gz', '', $targz_filepath);
         $untarred_dirpath = str_replace('.tar', '', $tar_filepath);
-        if (!file_exists($targz_filepath)) {
+        if (!file_exists($targz_filepath) || getenv('COMPOSERIZE_DRUPAL_NO_CACHE') == true) {
             file_put_contents(
                 $targz_filepath,
                 fopen(
