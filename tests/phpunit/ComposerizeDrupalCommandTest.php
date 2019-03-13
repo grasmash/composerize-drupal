@@ -139,13 +139,13 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
         $args = [
             '--composer-root' => '.',
-            '--drupal-root' => 'docroot',
             '--no-update' => true,
             '--no-gitignore' => true,
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-        $this->assertCorrectFileGeneration('');
+        $this->assertCorrectFileGeneration('docroot/');
+        $this->assertFileNotExists($this->sandbox . "/docroot/composer.json");
         $this->assertEquals($original_gitignore, file_get_contents($this->sandbox . '/.gitignore'));
     }
 
@@ -159,13 +159,13 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
         $args = [
             '--composer-root' => '.',
-            '--drupal-root' => 'docroot',
             '--no-update' => true,
             '--no-gitignore' => false,
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-        $this->assertCorrectFileGeneration('');
+        $this->assertCorrectFileGeneration('docroot/');
+        $this->assertFileNotExists($this->sandbox . "/docroot/composer.json");
         $this->assertNotEquals($original_gitignore, file_get_contents($this->sandbox . '/.gitignore'));
     }
 
