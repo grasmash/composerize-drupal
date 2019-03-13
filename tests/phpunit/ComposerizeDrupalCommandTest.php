@@ -139,7 +139,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
         $args = [
             '--composer-root' => '.',
-            '--drupal-root' => '.',
+            '--drupal-root' => 'docroot',
             '--no-update' => true,
             '--no-gitignore' => true,
         ];
@@ -159,7 +159,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         file_put_contents($this->sandbox . '/.gitignore', $original_gitignore);
         $args = [
             '--composer-root' => '.',
-            '--drupal-root' => '.',
+            '--drupal-root' => 'docroot',
             '--no-update' => true,
             '--no-gitignore' => false,
         ];
