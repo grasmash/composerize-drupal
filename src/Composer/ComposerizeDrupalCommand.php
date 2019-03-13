@@ -33,10 +33,16 @@ class ComposerizeDrupalCommand extends BaseCommand
     {
         $this->setName('composerize-drupal');
         $this->setDescription("Convert a non-Composer managed Drupal application into a Composer-managed application.");
-        $this->addOption('composer-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the directory that should contain composer.json.');
-        $this->addOption('drupal-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the Drupal root directory.');
-        $this->addOption('exact-versions', null, InputOption::VALUE_NONE, 'Use exact version constraints rather than the recommended caret operator.');
-        $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation.');
+        $this->addOption('composer-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the directory that should contain composer.json');
+        $this->addOption('drupal-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the Drupal root directory');
+        $this->addOption('contrib-dir', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'A comma separated list of additional directories, relative to the docroot, where contributed projects should be scanned. By default, the modules/contrib, themes/contrib, and profiles/contrib directories are scanned.');
+        $this->addOption('exact-versions', null, InputOption::VALUE_NONE, 'Use exact version constraints rather than the recommended caret operator');
+        $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation');
+        $this->addUsage('--composer-root=. --drupal-root=docroot');
+        $this->addUsage('--composer-root=. --drupal-root=web');
+        $this->addUsage('--composer-root=. --drupal-root=.');
+        $this->addUsage('--contrib-dir=profiles/lightning --contrib-dir=modules/something');
+        $this->addUsage('--exact-versions --no-update');
     }
 
     /**
@@ -360,6 +366,18 @@ class ComposerizeDrupalCommand extends BaseCommand
             $root_composer_json
         );
         $projects = array_merge($modules, $themes, $profiles);
+        $contrib_dirs = $this->input->getArgument('contrib-dir');
+        if ($contrib_dirs) {
+            foreach ($contrib_dirs as $dir) {
+                $contrib_projects =  DrupalInspector::findContribProjects(
+                    $this->drupalRoot,
+                    $dir,
+                    $root_composer_json
+                );
+                $projects = array_merge($contrib_projects, $projects);
+            }
+        }
+
         return $projects;
     }
 
