@@ -130,7 +130,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     }
 
     /**
-     * Test command whe --no-gitignore option is passed.
+     * Test command with --no-gitignore option is passed.
      */
     public function testNoGitignore()
     {
@@ -150,7 +150,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     }
 
     /**
-     * Test command whe --no-gitignore option is passed.
+     * Test command without --no-gitignore option is passed.
      */
     public function testGitignore()
     {
