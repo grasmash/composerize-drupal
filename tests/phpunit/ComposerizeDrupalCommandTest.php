@@ -136,7 +136,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $args = [
             '--composer-root' => '.',
             '--no-update' => true,
-            '--contrib-dir=modules',
+            '--contrib-dirs=modules',
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
