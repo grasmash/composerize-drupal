@@ -132,8 +132,8 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
     public function testFindContribDirs()
     {
         $this->sandbox = $this->sandboxManager->makeSandbox();
-        $this->fs->mirror($this->sandbox . '/modules/contrib/ctools', $this->sandbox . '/modules/ctools');
-        $this->fs->remove($this->sandbox . '/modules/contrib/ctools');
+        $this->fs->mirror($this->sandbox . '/docroot/modules/contrib/ctools', $this->sandbox . '/docroot/modules/ctools');
+        $this->fs->remove($this->sandbox . '/docroot/modules/contrib/ctools');
         $args = [
             '--composer-root' => '.',
             '--no-update' => true,
