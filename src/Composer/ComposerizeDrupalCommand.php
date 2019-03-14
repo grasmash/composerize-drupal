@@ -368,7 +368,7 @@ class ComposerizeDrupalCommand extends BaseCommand
             $root_composer_json
         );
         $projects = array_merge($modules, $themes, $profiles);
-        $contrib_dirs = $this->input->getArgument('contrib-dirs');
+        $contrib_dirs = $this->input->getOption('contrib-dirs');
         if ($contrib_dirs) {
             foreach ($contrib_dirs as $dir) {
                 $contrib_projects =  DrupalInspector::findContribProjects(
