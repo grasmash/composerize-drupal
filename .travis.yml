@@ -19,7 +19,6 @@ sudo: false
 cache:
   apt: true
   directories:
-  - export COMPOSER_PROCESS_TIMEOUT=600
   - "$HOME/.composer/cache"
   - "vendor"
 
@@ -27,6 +26,7 @@ install:
   - composer install
 
 script:
+  - export COMPOSER_PROCESS_TIMEOUT=600
   - composer test
 
 after_success:
