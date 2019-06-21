@@ -14,6 +14,7 @@ The `composerize-drupal` command will perform the following operations:
 * Generate a new `composer.json` in the `[composer-root]` directory based on [template.composer.json](template.composer.json).
     * Populate `require` with an entry for `drupal/core`
     * Populate `require` with an entry for each project in:
+        * `[drupal-root]/modules`
         * `[drupal-root]/modules/contrib`
         * `[drupal-root]/themes/contrib`
         * `[drupal-root]/profiles/contrib`
