@@ -351,9 +351,14 @@ class ComposerizeDrupalCommand extends BaseCommand
      */
     protected function findContribProjects($root_composer_json)
     {
-        $modules = DrupalInspector::findContribProjects(
+        $modules_contrib = DrupalInspector::findContribProjects(
             $this->drupalRoot,
             "modules/contrib",
+            $root_composer_json
+        );
+        $modules = DrupalInspector::findContribProjects(
+            $this->drupalRoot,
+            "modules",
             $root_composer_json
         );
         $themes = DrupalInspector::findContribProjects(
@@ -366,7 +371,7 @@ class ComposerizeDrupalCommand extends BaseCommand
             "profiles/contrib",
             $root_composer_json
         );
-        $projects = array_merge($modules, $themes, $profiles);
+        $projects = array_merge($modules_contrib, $modules, $themes, $profiles);
         return $projects;
     }
 
