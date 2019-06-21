@@ -19,6 +19,7 @@ sudo: false
 cache:
   apt: true
   directories:
+  - export COMPOSER_PROCESS_TIMEOUT=600
   - "$HOME/.composer/cache"
   - "vendor"
 
