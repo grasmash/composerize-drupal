@@ -20,13 +20,6 @@ class ComposerJsonManipulator
             }
         }
 
-        foreach ($template_composer_json->extra->{'merge-plugin'}->{'include'} as $key => $path) {
-            $processed_path = str_replace('[drupal-root]/', $replacement, $path);
-            if ($processed_path != $path) {
-                $template_composer_json->extra->{'merge-plugin'}->{'include'}[$key] = $processed_path;
-            }
-        }
-
         foreach ($template_composer_json->extra->{'drupal-scaffold'}->{'locations'} as $key => $path) {
             $processed_path = str_replace('[drupal-root]', $replacement, $path);
             if ($processed_path != $path) {

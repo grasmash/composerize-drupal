@@ -22,10 +22,7 @@
   "require": {
     "php": "^5.5.9|>=7.0.8",
     "composer/installers": "^1.2.0",
-    "cweagans/composer-patches": "^1.6.5",
-    "grasmash/drupal-security-warning": "^1.0.0",
-    "oomphinc/composer-installers-extender": "^1.1",
-    "wikimedia/composer-merge-plugin": "^1.4.1"
+    "cweagans/composer-patches": "^1.6.5"
   },
   "require-dev": {},
   "config": {
@@ -55,13 +52,6 @@
       "[drupal-root]/themes/custom/{$name}": ["type:drupal-custom-theme"],
       "[drupal-root]/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"],
       "drush/Commands/{$name}": ["type:drupal-drush"]
-    },
-    "merge-plugin": {
-      "include": [
-        "[drupal-root]/modules/custom/*/composer.json"
-      ],
-      "replace": false,
-      "ignore-duplicates": true
     }
   },
   "minimum-stability": "dev",
