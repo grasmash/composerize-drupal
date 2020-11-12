@@ -211,12 +211,12 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
             $composer_json->require->{'drupal/ctools'}
         );
         $this->assertObjectHasAttribute(
-            'drupal/core',
+            'drupal/core-recommended',
             $composer_json->require
         );
         $this->assertEquals(
             "^" . $this->sandboxManager->getDrupalVersion(),
-            $composer_json->require->{'drupal/core'}
+            $composer_json->require->{'drupal/core-recommended'}
         );
 
         // Assert installer paths.
