@@ -30,8 +30,7 @@
   "require-dev": {},
   "config": {
     "sort-packages": true,
-    "discard-changes": true,
-    "optimize-autoloader": true
+    "discard-changes": true
   },
   "conflict": {
     "drupal/drupal": "*"
@@ -39,9 +38,6 @@
   "extra": {
     "enable-patching": true,
     "composer-exit-on-patch-failure": false,
-    "patchLevel": {
-      "drupal/core": "-p2"
-    },
     "patches": [],
     "drupal-scaffold": {
       "locations": {
