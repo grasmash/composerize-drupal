@@ -23,7 +23,6 @@
     "php": "^5.5.9|>=7.0.8",
     "composer/installers": "^1.2.0",
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5.4",
     "grasmash/drupal-security-warning": "^1.0.0",
     "oomphinc/composer-installers-extender": "^1.1",
     "wikimedia/composer-merge-plugin": "^1.4.1"
@@ -44,6 +43,11 @@
       "drupal/core": "-p2"
     },
     "patches": [],
+    "drupal-scaffold": {
+      "locations": {
+        "web-root": "./[drupal-root]"
+      }
+    },
     "installer-types": ["bower-asset", "npm-asset"],
     "installer-paths": {
       "[drupal-root]/core": ["type:drupal-core"],
