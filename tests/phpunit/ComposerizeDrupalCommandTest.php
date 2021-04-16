@@ -219,6 +219,12 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
             $composer_json->require->{'drupal/core'}
         );
 
+        // Assert scaffold location.
+        $this->assertObjectHasAttribute('drupal-scaffold', $composer_json->extra);
+        $this->assertObjectHasAttribute('locations', $composer_json->extra->{'drupal-scaffold'});
+        $this->assertObjectHasAttribute('web-root', $composer_json->extra->{'drupal-scaffold'}->locations);
+        $this->assertSame($relative_drupal_root, $composer_json->extra->{'drupal-scaffold'}->locations->{'web-root'});
+
         // Assert installer paths.
         $this->assertObjectHasAttribute('installer-paths', $composer_json->extra);
         $this->assertObjectHasAttribute('drush/Commands/{$name}', $composer_json->extra->{'installer-paths'});

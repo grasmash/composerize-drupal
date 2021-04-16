@@ -26,6 +26,7 @@ class ComposerJsonManipulator
                 $template_composer_json->extra->{'merge-plugin'}->{'include'}[$key] = $processed_path;
             }
         }
+        $template_composer_json->extra->{'drupal-scaffold'}->locations->{'web-root'} = str_replace('[drupal-root]/', $replacement, $template_composer_json->extra->{'drupal-scaffold'}->locations->{'web-root'});
     }
 
     public static function writeObjectToJsonFile($object, $filename)

@@ -23,7 +23,7 @@
     "php": "^5.5.9|>=7.0.8",
     "composer/installers": "^1.2.0",
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5.4",
+    "drupal/core-composer-scaffold": "*",
     "grasmash/drupal-security-warning": "^1.0.0",
     "oomphinc/composer-installers-extender": "^1.1",
     "wikimedia/composer-merge-plugin": "^2"
@@ -38,6 +38,11 @@
     "drupal/drupal": "*"
   },
   "extra": {
+    "drupal-scaffold": {
+      "locations": {
+        "web-root": "[drupal-root]/"
+      }
+    },
     "enable-patching": true,
     "composer-exit-on-patch-failure": true,
     "patchLevel": {
