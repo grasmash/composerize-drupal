@@ -181,7 +181,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-        $process = new Process('composer require drupal/token:1.1.0');
+        $process = new Process('composer require drupal/console');
         $process->setTimeout(null);
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
