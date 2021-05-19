@@ -1,5 +1,5 @@
 {
-  "name": "rahulsonar/composerize-drupal",
+  "name": "grasmash/composerize-drupal",
   "description": "Convert a non-Composer managed Drupal application into a Composer-managed application.",
   "type": "composer-plugin",
   "require": {
