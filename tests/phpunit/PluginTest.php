@@ -29,8 +29,11 @@ class PluginTest extends CommandTestBase
         $process = new Process('composer global require grasmash/composerize-drupal "*@dev"');
         $process->run();
         // Code executed in `composer list` is not counted under code coverage.
+        var_dump(getcwd());
         $process = new Process('COMPOSER_ALLOW_XDEBUG=1 composer list');
         $process->run();
+        var_dump($process->getOutput());
+        var_dump($process->getErrorOutput());
         $this->assertContains($expected, $process->getOutput());
     }
 
