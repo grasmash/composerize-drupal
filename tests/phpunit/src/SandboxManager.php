@@ -62,7 +62,7 @@ class SandboxManager
         $sandbox = realpath($sandbox);
         $sandbox_master = Path::canonicalize($this->composerizeDrupalPath . "/tests/fixtures/sandbox");
         $this->fs->mirror($sandbox_master, $sandbox);
-        $this->dowloadAndCopyDrupalCore($this->drupalVersion, $this->tmp, $sandbox);
+        $this->downloadAndCopyDrupalCore($this->drupalVersion, $this->tmp, $sandbox);
         $this->downloadAndCopyCtools($this->tmp, $sandbox);
         // Create fake patch for ctools.
         $this->fs->touch($sandbox . "/docroot/modules/contrib/ctools/test.patch");
@@ -113,7 +113,7 @@ class SandboxManager
      *
      * @return array
      */
-    protected function dowloadAndCopyDrupalCore(
+    protected function downloadAndCopyDrupalCore(
         $drupal_version,
         $tmp,
         $sandbox
