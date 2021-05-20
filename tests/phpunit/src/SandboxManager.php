@@ -57,8 +57,8 @@ class SandboxManager
     {
         $this->tmp = getenv('COMPOSERIZE_DRUPAL_TMP') ?: sys_get_temp_dir();
         $sandbox = Path::canonicalize($this->tmp . "/composerize-drupal-sandbox");
-        $this->fs->remove($sandbox);
-        $this->fs->mkdir($sandbox);
+        $this->fs->remove([$sandbox]);
+        $this->fs->mkdir([$sandbox]);
         $sandbox = realpath($sandbox);
         $sandbox_master = Path::canonicalize($this->composerizeDrupalPath . "/tests/fixtures/sandbox");
         $this->fs->mirror($sandbox_master, $sandbox);
