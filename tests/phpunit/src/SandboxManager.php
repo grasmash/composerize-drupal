@@ -57,7 +57,7 @@ class SandboxManager
     {
         $this->tmp = getenv('COMPOSERIZE_DRUPAL_TMP') ?: sys_get_temp_dir();
         $sandbox = Path::canonicalize($this->tmp . "/composerize-drupal-sandbox");
-        $this->fs->remove([$sandbox]);
+        $this->deleteFolderRecursively($sandbox);
         $this->fs->mkdir([$sandbox]);
         $sandbox = realpath($sandbox);
         $sandbox_master = Path::canonicalize($this->composerizeDrupalPath . "/tests/fixtures/sandbox");
@@ -80,6 +80,27 @@ class SandboxManager
         $process->run();
 
         return $sandbox;
+    }
+
+    /**
+     * A helper function to delete folder recursively.
+     * See error in build https://travis-ci.com/github/rahulsonar-acquia/composerize-drupal/jobs/506595288
+     *
+     * @param $dir
+     */
+    private function deleteFolderRecursively($dir):void {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object))
+                        $this->deleteFolderRecursively($dir. DIRECTORY_SEPARATOR .$object);
+                    else
+                        $this->fs->remove($dir. DIRECTORY_SEPARATOR .$object);
+                }
+            }
+            $this->fs->remove($dir);
+        }
     }
 
     protected function downloadProjectFromDrupalOrg($project_string)
