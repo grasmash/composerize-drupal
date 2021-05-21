@@ -184,8 +184,6 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $process = new Process('composer require drupal/token:1.1.0');
         $process->setTimeout(null);
         $process->run();
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($this->sandbox . "/docroot/modules/contrib/token");
     }
