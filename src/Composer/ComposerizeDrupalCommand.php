@@ -26,6 +26,12 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected $drupalRoot;
     protected $drupalRootRelative;
     protected $drupalCoreVersion;
+
+    /**
+     * Composer1 path
+     */
+    protected $composerPath;
+
     /** @var Filesystem */
     protected $fs;
 
@@ -36,12 +42,43 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->addOption('composer-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the directory that should contain composer.json.');
         $this->addOption('drupal-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the Drupal root directory.');
         $this->addOption('exact-versions', null, InputOption::VALUE_NONE, 'Use exact version constraints rather than the recommended caret operator.');
+        $this->addOption('composer-path',null,InputOption::VALUE_OPTIONAL,'Composer1 path on the system');
         $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation.');
         $this->addOption('no-gitignore', null, InputOption::VALUE_NONE, 'Prevent root .gitignore file from being modified.');
         $this->addUsage('--composer-root=. --drupal-root=./docroot');
         $this->addUsage('--composer-root=. --drupal-root=./web');
         $this->addUsage('--composer-root=. --drupal-root=.');
         $this->addUsage('--exact-versions --no-update --no-gitignore');
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     */
+    public function initialize(InputInterface $input, OutputInterface $output)
+    {
+        if ($input->getOption('composer-path')) {
+            $this->composerPath = $input->getOption('composer-path');
+        } else {
+            $this->composerPath = 'composer';
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getComposerPath()
+    {
+        return $this->composerPath;
+    }
+
+    /**
+     * @param mixed $composer_path
+     */
+    public function setComposerPath($composer_path)
+    {
+        $this->composerPath = $composer_path;
     }
 
     /**
@@ -211,7 +248,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $output_callback = function ($type, $buffer) use ($io) {
             $io->write($buffer, false);
         };
-        return $executor->execute('composer update --no-interaction', $output_callback, $this->baseDir);
+        return $executor->execute("{$this->getComposerPath()} update --no-interaction", $output_callback, $this->baseDir);
     }
 
     /**
