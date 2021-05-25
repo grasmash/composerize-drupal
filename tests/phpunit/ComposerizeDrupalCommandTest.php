@@ -185,7 +185,7 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $process->setTimeout(null);
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertFileExists($this->sandbox . "/docroot/modules/contrib/token");
+        $this->assertFileExists($this->sandbox . "/docroot/modules/contrib/ctools");
     }
 
     /**
