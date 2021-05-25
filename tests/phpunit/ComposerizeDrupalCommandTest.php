@@ -181,11 +181,11 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         ];
         $options = [ 'interactive' => false ];
         $this->commandTester->execute($args, $options);
-        $process = new Process('composer require drupal/ctools');
+        $process = new Process('composer require drupal/token:1.1.0');
         $process->setTimeout(null);
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertFileExists($this->sandbox . "/docroot/modules/contrib/ctools");
+        $this->assertFileExists($this->sandbox . "/docroot/modules/contrib/token");
     }
 
     /**
