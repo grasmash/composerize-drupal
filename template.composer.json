@@ -23,10 +23,9 @@
     "php": "^5.5.9|>=7.0.8",
     "composer/installers": "^1.2.0",
     "cweagans/composer-patches": "^1.6.5",
-    "drupal-composer/drupal-scaffold": "^2.5.4",
     "grasmash/drupal-security-warning": "^1.0.0",
-    "oomphinc/composer-installers-extender": "^1.1",
-    "wikimedia/composer-merge-plugin": "^1.4.1"
+    "oomphinc/composer-installers-extender": "^2.0",
+    "wikimedia/composer-merge-plugin": "^2.0"
   },
   "require-dev": {},
   "config": {
