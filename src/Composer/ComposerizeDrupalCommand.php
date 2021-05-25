@@ -42,7 +42,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $this->addOption('composer-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the directory that should contain composer.json.');
         $this->addOption('drupal-root', null, InputOption::VALUE_REQUIRED, 'The relative path to the Drupal root directory.');
         $this->addOption('exact-versions', null, InputOption::VALUE_NONE, 'Use exact version constraints rather than the recommended caret operator.');
-        $this->addOption('composer-path',null,InputOption::VALUE_OPTIONAL,'Composer1 path on the system');
+        $this->addOption('composer-path', null, InputOption::VALUE_OPTIONAL, 'Composer1 path on the system');
         $this->addOption('no-update', null, InputOption::VALUE_NONE, 'Prevent "composer update" being run after file generation.');
         $this->addOption('no-gitignore', null, InputOption::VALUE_NONE, 'Prevent root .gitignore file from being modified.');
         $this->addUsage('--composer-root=. --drupal-root=./docroot');

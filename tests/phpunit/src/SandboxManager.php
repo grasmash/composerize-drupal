@@ -88,15 +88,17 @@ class SandboxManager
      *
      * @param $dir
      */
-    private function deleteFolderRecursively($dir):void {
+    private function deleteFolderRecursively($dir):void
+    {
         if (is_dir($dir)) {
             $objects = scandir($dir);
             foreach ($objects as $object) {
                 if ($object != "." && $object != "..") {
-                    if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object))
-                        $this->deleteFolderRecursively($dir. DIRECTORY_SEPARATOR .$object);
-                    else
-                        $this->fs->remove($dir. DIRECTORY_SEPARATOR .$object);
+                    if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
+                        $this->deleteFolderRecursively($dir . DIRECTORY_SEPARATOR . $object);
+                    } else {
+                        $this->fs->remove($dir . DIRECTORY_SEPARATOR . $object);
+                    }
                 }
             }
             $this->fs->remove($dir);
