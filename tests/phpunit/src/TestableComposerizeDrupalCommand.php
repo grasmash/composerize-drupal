@@ -23,7 +23,7 @@ class TestableComposerizeDrupalCommand extends ComposerizeDrupalCommand
      * Composer application. We need to use our own Application class to do
      * this, since Composer does not provide a setIO() method.
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    public function initialize(InputInterface $input, OutputInterface $output)
     {
         parent::initialize($input, $output);
         $helperSet = new HelperSet([ new QuestionHelper() ]);
