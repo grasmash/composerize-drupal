@@ -22,27 +22,25 @@
   "require": {
     "php": "^5.5.9|>=7.0.8",
     "composer/installers": "^1.2.0",
-    "cweagans/composer-patches": "^1.6.5",
-    "grasmash/drupal-security-warning": "^1.0.0",
-    "oomphinc/composer-installers-extender": "^2.0",
-    "wikimedia/composer-merge-plugin": "^2.0"
+    "cweagans/composer-patches": "^1.6.5"
   },
   "require-dev": {},
   "config": {
     "sort-packages": true,
-    "discard-changes": true,
-    "optimize-autoloader": true
+    "discard-changes": true
   },
   "conflict": {
     "drupal/drupal": "*"
   },
   "extra": {
     "enable-patching": true,
-    "composer-exit-on-patch-failure": true,
-    "patchLevel": {
-      "drupal/core": "-p2"
-    },
+    "composer-exit-on-patch-failure": false,
     "patches": [],
+    "drupal-scaffold": {
+      "locations": {
+        "web-root": "./[drupal-root]"
+      }
+    },
     "installer-types": ["bower-asset", "npm-asset"],
     "installer-paths": {
       "[drupal-root]/core": ["type:drupal-core"],
@@ -54,13 +52,6 @@
       "[drupal-root]/themes/custom/{$name}": ["type:drupal-custom-theme"],
       "[drupal-root]/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"],
       "drush/Commands/{$name}": ["type:drupal-drush"]
-    },
-    "merge-plugin": {
-      "include": [
-        "[drupal-root]/modules/custom/*/composer.json"
-      ],
-      "replace": false,
-      "ignore-duplicates": true
     }
   },
   "minimum-stability": "dev",

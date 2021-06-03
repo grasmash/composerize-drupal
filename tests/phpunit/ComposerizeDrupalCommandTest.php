@@ -211,12 +211,12 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
             $composer_json->require->{'drupal/ctools'}
         );
         $this->assertObjectHasAttribute(
-            'drupal/core',
+            'drupal/core-recommended',
             $composer_json->require
         );
         $this->assertEquals(
             "^" . $this->sandboxManager->getDrupalVersion(),
-            $composer_json->require->{'drupal/core'}
+            $composer_json->require->{'drupal/core-recommended'}
         );
 
         // Assert installer paths.
@@ -238,8 +238,5 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $this->assertObjectHasAttribute('drupal/ctools', $composer_json->extra->patches);
         $this->assertObjectHasAttribute($patch_relative_path, $composer_json->extra->patches->{"drupal/ctools"});
         $this->assertEquals($patch_relative_path, $composer_json->extra->patches->{"drupal/ctools"}->{$patch_relative_path});
-
-        // Assert merge-plugin.
-        $this->assertContains($relative_drupal_root . "modules/custom/*/composer.json", $composer_json->extra->{'merge-plugin'}->include);
     }
 }

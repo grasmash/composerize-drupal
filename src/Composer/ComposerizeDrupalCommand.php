@@ -255,9 +255,13 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected function requireDrupalCore($root_composer_json)
     {
         $version_constraint = DrupalInspector::getVersionConstraint($this->drupalCoreVersion, $this->input->getOption('exact-versions'));
-        $root_composer_json->require->{'drupal/core'} = $version_constraint;
+        $root_composer_json->require->{'drupal/core-recommended'} = $version_constraint;
         $this->getIO()
-            ->write("<info>Added drupal/core $version_constraint to requirements.</info>");
+            ->write("<info>Added drupal/core-recommended $version_constraint to requirements.</info>");
+        // Adding drupal/core-composer-scaffold with the same drupal core version.
+        $root_composer_json->require->{'drupal/core-composer-scaffold'} = $version_constraint;
+        $this->getIO()
+            ->write("<info>Added drupal/core-composer-scaffold $version_constraint to requirements.</info>");
     }
 
     /**
@@ -329,7 +333,7 @@ class ComposerizeDrupalCommand extends BaseCommand
         $finder = new Finder();
         $finder->in($this->baseDir)
             ->files()
-            ->name('/^composer\.(lock|json)$/');
+            ->name('/(^composer\.(lock|json)$)|autoload.php/');
         $files = iterator_to_array($finder);
         $this->fs->remove($files);
     }
