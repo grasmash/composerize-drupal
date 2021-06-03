@@ -19,12 +19,11 @@ The `composerize-drupal` command will perform the following operations:
         * `[drupal-root]/themes/contrib`
         * `[drupal-root]/profiles/contrib`
     * Require and configure suggested Composer plugins:
-        * Add [Composer Installer](https://github.com/grasmash/composerize-drupal) file paths to `extra` configuration to ensure that Drupal projects are downloaded to the correct locations.
-        * Merge dependencies from `[drupal-root]/modules/custom/*/composer.json` into your root dependencies via [Composer Merge](https://github.com/wikimedia/composer-merge-plugin), permitting custom modules to have separate `composer.json` files.
+        * Add `drupal/composer-scaffold` file paths to `extra` configuration to ensure that Drupal projects are downloaded to the correct locations.
         * Create and populate `extra.patches` object to facilitate patching with [Composer Patches](https://github.com/cweagans/composer-patches). Patches to profiles, themes, and modules will be automatically discovered and moved to the a new [repo-root]/patches directory.
-      * Add entries to `repositories`:
-        * `https://packages.drupal.org/8` for installing packages from Drupal.org
-        * [`https://asset-packagist.org/`](https://asset-packagist.org/) to permit installing NPM packages.
+        * Add entries to `repositories`:
+            * `https://packages.drupal.org/8` for installing packages from Drupal.org
+            * [`https://asset-packagist.org/`](https://asset-packagist.org/) to permit installing NPM packages.
 * Create or modify `[composer-root]/.gitignore` with entries for Composer-managed contributed projects as [per best practices](https://getcomposer.org/doc/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md). You can modify `.gitignore` after composerization if you'd prefer not to follow this practice.
 * Execute `composer update` to generate `composer.lock`, autoload files, and install all dependencies in the correct locations.
 
