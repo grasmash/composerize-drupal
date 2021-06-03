@@ -238,6 +238,5 @@ class ComposerizeDrupalCommandTest extends CommandTestBase
         $this->assertObjectHasAttribute('drupal/ctools', $composer_json->extra->patches);
         $this->assertObjectHasAttribute($patch_relative_path, $composer_json->extra->patches->{"drupal/ctools"});
         $this->assertEquals($patch_relative_path, $composer_json->extra->patches->{"drupal/ctools"}->{$patch_relative_path});
-
     }
 }
