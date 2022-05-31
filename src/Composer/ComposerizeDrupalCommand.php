@@ -173,6 +173,9 @@ class ComposerizeDrupalCommand extends BaseCommand
     protected function requireContribProjects($root_composer_json, $projects)
     {
         foreach ($projects as $project_name => $project) {
+            // @todo
+            // Failed composerize process for Acquia packages ex.- acquia/acquia_cms, acquia/cohesion etc.
+            // Need to discuss.
             $package_name = "drupal/$project_name";
             $version_constraint = DrupalInspector::getVersionConstraint($project['version'], $this->input->getOption('exact-versions'));
             $root_composer_json->require->{$package_name} = $version_constraint;
