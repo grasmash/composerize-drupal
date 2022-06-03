@@ -7,7 +7,7 @@
     "composer-plugin-api": "^2.0",
     "composer/semver": "^3",
     "symfony/finder": "^3.4",
-    "symfony/yaml": "^3.4|^5.0",
+    "symfony/yaml": "^3.4| ^4.0 | ^5.0",
     "webflo/drupal-finder": "^1.1",
     "webmozart/path-util": "^2.3"
   },
